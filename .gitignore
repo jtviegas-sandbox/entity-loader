@@ -61,3 +61,9 @@ typings/
 .next
 .DS_Store
 .idea
+notification.json
+tenant.js
+split4ever.js
+devops/split4ever.include
+devops/split4ever_function_store_loader_prod.zip
+package-lock.json

@@ -2,8 +2,10 @@
 
 const winston = require('winston');
 const commons = require('@jtviegas/jscommons').commons;
+const tenant = require("./tenant");
 
 const config_module = function(){
+
 
     let config = {
         STAGE_SCOPE: [ 'dev', 'test', 'prod']
@@ -36,8 +38,8 @@ const config_module = function(){
 
     const defaults = [
         null
-        , 'dev'
-        , 'local'
+        , 'prod'
+        , 'prod'
         , null // 'http://localhost:8000'
         , 'eu-west-1'
         , '2012-08-10'
@@ -46,7 +48,7 @@ const config_module = function(){
         , null
     ];
 
-    config = commons.configByEnvironment(config, variables, defaults, '_SCOPE', []);
+    config = commons.configByDecoration(config, variables, defaults, tenant, '_SCOPE', []);
 
     console.log(config)
     return config;

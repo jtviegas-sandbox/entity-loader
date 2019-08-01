@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/jtviegas/store-loader#readme",
   "dependencies": {
-    "@jtviegas/jscommons": "0.0.2",
+    "@jtviegas/jscommons": "0.0.3",
     "winston": "^3.2.1"
   }
 }

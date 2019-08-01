@@ -3,7 +3,7 @@
 const winston = require('winston');
 const config = require("./config");
 const logger = winston.createLogger(config['WINSTON_CONFIG']);
-//const service = require('@jtviegas/store-loader-service')(config);
+const service = require('@jtviegas/store-loader-service')(config);
 const ServerError = require('@jtviegas/jscommons').ServerError;
 
 exports.handler = (event, context, callback) => {
@@ -19,35 +19,24 @@ exports.handler = (event, context, callback) => {
     });
     
     try {
-
-        /*
         let stage = null;
+        let bucket = null;
         for(let i=0; i<event.Records.length; i++){
-
             let record = event.Records[i];
-            if( record.s3 && record.s3.bucket && record.s3.bucket.name === ENTITIES_BUCKET_NAME ){
-                if( record.s3.object.key === DEV_UPDATE_SIGNAL_FILE ) {
-                    stage = 'dev';
-                    break;
-                }
-                if (record.s3.object.key === PROD_UPDATE_SIGNAL_FILE) {
-                    stage = 'prod';
-                    break;
-                }
+            if( record.s3 && record.s3.bucket && record.s3.bucket.arn && record.s3.object && record.s3.object.key){
+                stage =  record.s3.object.key.split(".")[0];
+                bucket = record.s3.bucket.arn;
+                break;
             }
-
         }
 
-
-        if( null === stage )
-            throw new ServerError("no stage defined", 400);
+        if( null === stage  || null === bucket )
+            throw new ServerError("event must provide 'stage' and 'bucket'", 400);
         else {
-            if( -1 === config.STAGES.indexOf(stage) )
+            if( -1 === config.STAGE_SCOPE.indexOf( stage ) )
                 throw new ServerError(`wrong stage: "${stage}"`, 400);
-            service.load(stage, done);
+            service.load(stage, bucket, done);
         }
-        */
-        done(null, {});
     }
     catch(error) {
       done(error);

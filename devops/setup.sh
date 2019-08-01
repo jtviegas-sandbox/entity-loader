@@ -134,6 +134,7 @@ if [[ -d "${AWS_SDK_MODULE_PATH}" ]]; then
     rm -rf "$AWS_SDK_MODULE_PATH"
 fi
 rm -f "$this_folder/$FUNCTION_STORE_LOADER".zip
+cp "$this_folder/$TENANT".js "${parent_folder}/src/tenant.js"
 zip -9 -r "$this_folder/$FUNCTION_STORE_LOADER".zip index.js config.js node_modules
 __r=$?
 if [[ ! "$__r" -eq "0" ]] ; then cd ${_pwd} && exit 1; fi
