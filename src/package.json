@@ -1,0 +1,29 @@
+{
+  "name": "store-loader",
+  "version": "0.0.1",
+  "description": "a solution to load entities to an s3 bucket and through an event function to create related entries in a DynamoDB table",
+  "main": "index.js",
+  "scripts": {
+    "test": "./test.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jtviegas/store-loader.git"
+  },
+  "keywords": [
+    "aws",
+    "DynamoDb",
+    "s3",
+    "lambda"
+  ],
+  "author": "Joao Tiago Viegas <jtviegas.js@gmail.com>",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/jtviegas/store-loader/issues"
+  },
+  "homepage": "https://github.com/jtviegas/store-loader#readme",
+  "dependencies": {
+    "@jtviegas/jscommons": "0.0.2",
+    "winston": "^3.2.1"
+  }
+}
