@@ -3,7 +3,7 @@
 const winston = require('winston');
 const config = require("./config");
 const logger = winston.createLogger(config['WINSTON_CONFIG']);
-const service = require('@jtviegas/store-loader-service')(config);
+//const service = require('@jtviegas/store-loader-service')(config);
 const ServerError = require('@jtviegas/jscommons').ServerError;
 
 exports.handler = (event, context, callback) => {
@@ -35,7 +35,7 @@ exports.handler = (event, context, callback) => {
         else {
             if( -1 === config.STAGE_SCOPE.indexOf( stage ) )
                 throw new ServerError(`wrong stage: "${stage}"`, 400);
-            service.load(stage, bucket, done);
+            //service.load(stage, bucket, done);
         }
     }
     catch(error) {
