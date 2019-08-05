@@ -9,11 +9,7 @@
           "FilterRules": [
             {
               "Name": "prefix",
-              "Value": "dev"
-            }
-            , {
-              "Name": "suffix",
-              "Value": ".update"
+              "Value": "development/update"
             }
           ]
         }
@@ -28,11 +24,7 @@
           "FilterRules": [
             {
               "Name": "prefix",
-              "Value": "prod"
-            }
-            , {
-              "Name": "suffix",
-              "Value": ".update"
+              "Value": "production/update"
             }
           ]
         }

@@ -8,6 +8,7 @@ BUCKETS_USER_ACTIONS="s3:ListAllMyBuckets,s3:HeadBucket,iam:ChangePassword,s3:Li
 BUCKETS_FUNCTION_ACTIONS="s3:*"
 POLICY_TABLES_ACTIONS="dynamodb:*"
 AWS_SDK_MODULE_PATH=node_modules/aws-sdk
+BUCKET_ENTITIES_FOLDERS="development/ production/"
 
 FUNCTION_HANDLER=index.handler
 FUNCTION_RUNTIME=nodejs8.10

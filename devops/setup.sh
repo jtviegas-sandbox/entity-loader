@@ -38,6 +38,14 @@ createBucket ${BUCKET_ENTITIES}
 __r=$?
 if [[ ! "$__r" -eq "0" ]] ; then cd ${_pwd} && exit 1; fi
 
+debug "...adding folders to bucket ${BUCKET_ENTITIES} ..."
+for f in ${BUCKET_ENTITIES_FOLDERS}; do
+    aws s3api put-object --bucket ${BUCKET_ENTITIES} --key ${f}
+    __r=$?
+    if [[ ! "$__r" -eq "0" ]] ; then cd ${_pwd} && exit 1; fi
+    info "...added folder $f to bucket $BUCKET_ENTITIES..."
+done
+
 debug "...creating table for entity: $TABLE ..."
 createTable "${TABLE}"
 __r=$?

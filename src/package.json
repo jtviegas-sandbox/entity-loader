@@ -24,6 +24,7 @@
   "homepage": "https://github.com/jtviegas/store-loader#readme",
   "dependencies": {
     "@jtviegas/jscommons": "0.0.3",
+    "@jtviegas/store-loader-service": "0.0.14",
     "winston": "^3.2.1"
   }
 }
