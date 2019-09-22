@@ -1,3 +1,3 @@
-SYS_USERS="user1 user2"
+TENANT=split4ever
+SYS_USERS="tiago rocha"
 ENTITY=items
-ENV=prod

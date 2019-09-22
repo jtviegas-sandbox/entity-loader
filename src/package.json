@@ -4,7 +4,8 @@
   "description": "a solution to load entities to an s3 bucket and through an event function to create related entries in a DynamoDB table",
   "main": "index.js",
   "scripts": {
-    "test": "./test.sh"
+    "test": "./test.sh",
+    "cover": "node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- -R spec test/*"
   },
   "repository": {
     "type": "git",
@@ -23,8 +24,16 @@
   },
   "homepage": "https://github.com/jtviegas/store-loader#readme",
   "dependencies": {
-    "@jtviegas/jscommons": "0.0.3",
-    "@jtviegas/store-loader-service": "0.0.14",
+    "@jtviegas/jscommons": "0.0.21",
+    "@jtviegas/store-loader-service": "latest",
     "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "coveralls": "^3.0.6",
+    "istanbul": "^0.4.5",
+    "mocha": "^6.1.4",
+    "@jtviegas/bucket-wrapper": "latest",
+    "@jtviegas/dyndbstore": "latest"
   }
 }

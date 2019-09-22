@@ -1,10 +1,10 @@
 PROJ=store-loader
-TENANT=split4ever
+
 ROLE_ASSUMING_POLICY_FILENAME=role_assuming.policy
 POLICY_LOGS_ACTIONS="logs:*"
 LOGS_ARN="arn:aws:logs:*:*:*"
-#POLICY_STORE_UPDATE_ACTIONS="s3:ListAllMyBuckets,s3:HeadBucket,iam:ChangePassword"
-BUCKETS_USER_ACTIONS="s3:ListAllMyBuckets,s3:HeadBucket,iam:ChangePassword,s3:ListBucketByTags,s3:GetBucketTagging,s3:ListBucketVersions,s3:GetBucketLogging,s3:CreateBucket,s3:ListBucket,s3:GetBucketPolicy,s3:PutEncryptionConfiguration,s3:GetObjectAcl,s3:PutBucketTagging,s3:DeleteObject,s3:DeleteBucket,s3:PutBucketVersioning,s3:PutObjectAcl,s3:ListBucketMultipartUploads,s3:PutObjectVersionTagging,s3:GetBucketVersioning,s3:PutBucketCORS,s3:GetBucketAcl,s3:GetBucketNotification,s3:PutInventoryConfiguration,s3:PutObject,s3:PutBucketNotification,s3:PutBucketWebsite,s3:PutBucketRequestPayment,s3:PutBucketLogging,s3:GetBucketCORS,s3:GetBucketLocation"
+BUCKETS_USER_ACTIONS="s3:ListBucketByTags,s3:GetBucketTagging,s3:ListBucketVersions,s3:GetBucketLogging,s3:CreateBucket,s3:ListBucket,s3:GetBucketPolicy,s3:PutEncryptionConfiguration,s3:GetObjectAcl,s3:PutBucketTagging,s3:DeleteObject,s3:DeleteBucket,s3:PutBucketVersioning,s3:PutObjectAcl,s3:ListBucketMultipartUploads,s3:PutObjectVersionTagging,s3:GetBucketVersioning,s3:PutBucketCORS,s3:GetBucketAcl,s3:GetBucketNotification,s3:PutInventoryConfiguration,s3:PutObject,s3:PutBucketNotification,s3:PutBucketWebsite,s3:PutBucketRequestPayment,s3:PutBucketLogging,s3:GetBucketCORS,s3:GetBucketLocation"
+BUCKETS_USER_GENERAL_ACTIONS="s3:ListAllMyBuckets,s3:HeadBucket,iam:ChangePassword"
 BUCKETS_FUNCTION_ACTIONS="s3:*"
 POLICY_TABLES_ACTIONS="dynamodb:*"
 AWS_SDK_MODULE_PATH=node_modules/aws-sdk
@@ -16,3 +16,6 @@ FUNCTION_TIMEOUT=60
 FUNCTION_MEMORY=1024
 FUNCTION_PRINCIPAL=s3.amazonaws.com
 FUNCTION_LOADER_ACTIONS="lambda:InvokeFunction"
+
+ENV_PROD=pro
+ENV_DEV=dev

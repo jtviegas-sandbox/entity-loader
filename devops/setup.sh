@@ -3,13 +3,17 @@
 this_folder="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 parent_folder=$(dirname $this_folder)
 
-. ${this_folder}/lib
-. ${this_folder}/include
+
+curl -XGET https://raw.githubusercontent.com/jtviegas/script-utils/master/bash/aws.sh -o "${this_folder}"/aws.sh
+
+. "${this_folder}"/aws.sh
+# shellcheck disable=SC1090
+. "${this_folder}"/include
+
+# shellcheck disable=SC1090
+. "${this_folder}"/tenant.include
 
 if [[ -z $TENANT ]] ; then err "no TENANT defined" && exit 1; fi
-
-. ${this_folder}/"${TENANT}.include"
-
 
 _pwd=`pwd`
 cd ${this_folder}
@@ -19,14 +23,17 @@ __r=0
 GROUP_SYS="${TENANT}_system_group"
 ROLE_STORE_UPDATE="${TENANT}_store_update_role"
 POLICY_LOGS="${TENANT}_logs_policy"
-#POLICY_STORE_UPDATE="${TENANT}_store_update_policy"
 BUCKET_ENTITIES="${TENANT}-${ENTITY}"
 POLICY_BUCKETS_USER="${TENANT}_policy_for_buckets_user"
+POLICY_BUCKETS_GENERAL_USER="${TENANT}_policy_for_buckets_general_user"
 BUCKETS_ARN="arn:aws:s3:::${BUCKET_ENTITIES},arn:aws:s3:::${BUCKET_ENTITIES}/*"
 POLICY_BUCKETS_FUNCTION="${TENANT}_policy_for_buckets_function"
 POLICY_TABLES="${TENANT}_policy_for_tables_update"
-TABLE="${TENANT}_${ENTITY}_${ENV}"
-FUNCTION_STORE_LOADER="${TENANT}_function_store_loader_${ENV}"
+TABLE_PROD="${TENANT}_${ENTITY}_${ENV_PROD}"
+TABLE_DEV="${TENANT}_${ENTITY}_${ENV_DEV}"
+TABLES="${TABLE_PROD} ${TABLE_DEV}"
+TABLES_ARN="arn:aws:dynamodb:::table/${TABLE_PROD},arn:aws:dynamodb:::table/${TABLE_DEV}"
+FUNCTION_STORE_LOADER="${TENANT}_function_store_loader"
 FUNCTION_PERMISSION_ID="${TENANT}_001"
 DEV_FUNCTION_EVENT_ID="${TENANT}_store_loader_event_dev"
 PROD_FUNCTION_EVENT_ID="${TENANT}_store_loader_event_prod"
@@ -46,10 +53,13 @@ for f in ${BUCKET_ENTITIES_FOLDERS}; do
     info "...added folder $f to bucket $BUCKET_ENTITIES..."
 done
 
-debug "...creating table for entity: $TABLE ..."
-createTable "${TABLE}"
-__r=$?
-if [[ ! "$__r" -eq "0" ]] ; then cd ${_pwd} && exit 1; fi
+debug "...creating tables ..."
+for t in ${TABLES}; do
+    createTable "${t}"
+    __r=$?
+    if [[ ! "$__r" -eq "0" ]] ; then cd ${_pwd} && exit 1; fi
+    info "...created table $t..."
+done
 
 debug "...creating group for sys maintenance users ($GROUP_SYS)..."
 createGroup ${GROUP_SYS}
@@ -79,27 +89,28 @@ createPolicy ${POLICY_LOGS} "$policy"
 __r=$?
 if [[ ! "$__r" -eq "0" ]] ; then cd ${_pwd} && exit 1; fi
 
-# policy=$(buildPolicy "Allow" "$POLICY_STORE_UPDATE_ACTIONS")
-# debug "...policy: $POLICY_STORE_UPDATE..."
-# createPolicy ${POLICY_STORE_UPDATE} "$policy"
-# __r=$?
-# if [[ ! "$__r" -eq "0" ]] ; then cd ${_pwd} && exit 1; fi
 
 debug "...creating policies... buckets user: $POLICY_BUCKETS_USER..."
-policy=$(buildPolicy "Allow" "$BUCKETS_USER_ACTIONS" "${BUCKETS_ARN}")
-createPolicy ${POLICY_BUCKETS_USER} "$policy"
+policy=$(buildPolicy "Allow" "$BUCKETS_USER_ACTIONS" "$BUCKETS_ARN")
+createPolicy "${POLICY_BUCKETS_USER}" "$policy"
+__r=$?
+if [[ ! "$__r" -eq "0" ]] ; then cd ${_pwd} && exit 1; fi
+
+debug "...creating policies... buckets user: $POLICY_BUCKETS_GENERAL_USER..."
+policy=$(buildPolicy "Allow" "$BUCKETS_USER_GENERAL_ACTIONS")
+createPolicy "${POLICY_BUCKETS_GENERAL_USER}" "$policy"
 __r=$?
 if [[ ! "$__r" -eq "0" ]] ; then cd ${_pwd} && exit 1; fi
 
 debug "...creating policies... buckets function: $POLICY_BUCKETS_FUNCTION..."
 policy=$(buildPolicy "Allow" "$BUCKETS_FUNCTION_ACTIONS" "${BUCKETS_ARN}")
 info "...creating policy: $POLICY_BUCKETS_FUNCTION..."
-createPolicy ${POLICY_BUCKETS_FUNCTION} "$policy"
+createPolicy "${POLICY_BUCKETS_FUNCTION}" "$policy"
 __r=$?
 if [[ ! "$__r" -eq "0" ]] ; then cd ${_pwd} && exit 1; fi
 
-table_arn=`aws dynamodb describe-table --output text --table-name "${TABLE}" | grep "arn.*${TABLE}" | awk '{print $4}' | sed "s/\//\\//g"`
-policy=$(buildPolicy "Allow" "$POLICY_TABLES_ACTIONS" "$table_arn")
+#table_arn=`aws dynamodb describe-table --output text --table-name "${TABLE}" | grep "arn.*${TABLE}" | awk '{print $4}' | sed "s/\//\\//g"`
+policy=$(buildPolicy "Allow" "$POLICY_TABLES_ACTIONS" "$TABLES_ARN")
 info "...creating policy: $POLICY_TABLES..."
 createPolicy ${POLICY_TABLES} "$policy"
 __r=$?
@@ -112,6 +123,11 @@ if [[ ! "$__r" -eq "0" ]] ; then cd ${_pwd} && exit 1; fi
 
 debug "...attaching policies to groups: $POLICY_BUCKETS_USER -> $GROUP_SYS..."
 attachPolicyToGroup ${POLICY_BUCKETS_USER} ${GROUP_SYS}
+__r=$?
+if [[ ! "$__r" -eq "0" ]] ; then cd ${_pwd} && exit 1; fi
+
+debug "...attaching policies to groups: $POLICY_BUCKETS_GENERAL_USER -> $GROUP_SYS..."
+attachPolicyToGroup ${POLICY_BUCKETS_GENERAL_USER} ${GROUP_SYS}
 __r=$?
 if [[ ! "$__r" -eq "0" ]] ; then cd ${_pwd} && exit 1; fi
 

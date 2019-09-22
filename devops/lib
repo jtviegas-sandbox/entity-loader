@@ -553,7 +553,7 @@ createFunction()
         warn "could not find role arn for name: $__role"
         __r=1
     else
-        echo "aws lambda create-function --function-name $__function --zip-file fileb://$__zip --handler $__handler --runtime $__runtime --role $arn --timeout $__timeout --memory-size $__memory" 
+        # echo "aws lambda create-function --function-name $__function --zip-file fileb://$__zip --handler $__handler --runtime $__runtime --role $arn --timeout $__timeout --memory-size $__memory"
         aws lambda create-function --function-name $__function --zip-file fileb://$__zip --handler $__handler --runtime $__runtime --role $arn --timeout $__timeout --memory-size $__memory
         __r=$?
         if [ ! "$__r" -eq "0" ] ; then warn "! could not create function $__function !"; else info "created function $__function" ; fi

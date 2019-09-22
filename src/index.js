@@ -1,13 +1,32 @@
 'use strict';
 
 const winston = require('winston');
-const config = require("./config");
-const logger = winston.createLogger(config['WINSTON_CONFIG']);
-const service = require('@jtviegas/store-loader-service')(config);
+const commons = require('@jtviegas/jscommons').commons;
 const ServerError = require('@jtviegas/jscommons').ServerError;
+const logger = winston.createLogger(commons.getDefaultWinstonConfig());
+
+const constants = {
+    STORELOADERSERVICE_DATA_DESCRIPTOR_FILE: 'data.spec'
+    , STORELOADER_ENVIRONMENTS: ['production','development','test']
+};
+const CONFIGURATION_SPEC = {
+    STORELOADER_APP: 'STORELOADER_APP'
+    , STORELOADERSERVICE_AWS_REGION: 'STORELOADER_AWS_REGION'
+    , STORELOADERSERVICE_AWS_ACCESS_KEY_ID: 'STORELOADER_AWS_ACCESS_KEY_ID'
+    , STORELOADERSERVICE_AWS_ACCESS_KEY: 'STORELOADER_AWS_ACCESS_KEY'
+
+    // testing environment
+    , STORELOADERSERVICE_BUCKETWRAPPER_TEST_aws_s3_endpoint: 'STORELOADER_BUCKETWRAPPER_TEST_aws_s3_endpoint'
+    , STORELOADERSERVICE_AWS_DB_ENDPOINT: 'STORELOADER_AWS_DB_ENDPOINT'
+};
+
+logger.info("[storeloader]...initializing store-loader module...");
+let configuration = commons.getConfiguration(CONFIGURATION_SPEC, constants, commons.handleTestVariables);
+logger.info("[storeloader] configuration: %o", configuration);
+const service = require('@jtviegas/store-loader-service')(configuration);
 
 exports.handler = (event, context, callback) => {
-    logger.info('[handler|in] (event: %s, context: %s)', JSON.stringify(event, null, 4), JSON.stringify(context, null, 2));
+    logger.info('[storeloader|handler|in] (event: %o, context: %o)', event, context);
 
     const done = (err, res) => callback( null, {
         statusCode: err ? ( err.status ? err.status : 500 ) : 200,
@@ -17,36 +36,35 @@ exports.handler = (event, context, callback) => {
             'Access-Control-Allow-Origin': '*'
         }
     });
-    
+
     try {
-        let stage = null;
+        let entity = null;
+        let environment = null;
         let bucket = null;
-        let folder = null;
+
         for(let i=0; i<event.Records.length; i++){
             let record = event.Records[i];
             if( record.s3 && record.s3.bucket && record.s3.bucket.name && record.s3.object && record.s3.object.key){
-                folder =  record.s3.object.key.split("/")[0];
-                let index = config.BUCKET_FOLDERS.indexOf(folder);
-                if( -1 >= index )
-                    throw new ServerError(`wrong folder: "${folder}"`, 400);
-                stage = config.BUCKET_FOLDERS_STAGE[index];
+                let keyElements =  record.s3.object.key.split("/");
+                entity = keyElements[0];
+                environment = keyElements[1];
+                if( -1 >= configuration.STORELOADER_ENVIRONMENTS.indexOf(environment) )
+                    throw new ServerError(`wrong environment: "${environment}"`, 400);
                 bucket = record.s3.bucket.name;
                 break;
             }
         }
 
-        if( null === stage  || null === bucket || null === folder )
-            throw new ServerError("event must provide 'stage', 'folder' and 'bucket'", 400);
-        else {
-            if( -1 === config.STAGE_SCOPE.indexOf( stage ) )
-                throw new ServerError(`wrong stage: "${stage}"`, 400);
-            service.load(stage, folder, bucket, done);
-        }
+        if( null === environment  || null === entity || null === bucket )
+            throw new ServerError("event must provide 'entity', 'environment' and 'bucket'", 400);
+
+        service.load(configuration.STORELOADER_APP, entity, environment, bucket, done);
+
     }
     catch(error) {
-      done(error);
+        done(error);
     }
-    logger.info('[handler|out]');
+    logger.info('[storeloader|handler|out]');
 };
 
 /*
@@ -102,3 +120,4 @@ let context = {
 
 exports.handler(event, context, (e,d)=>{console.log('DONE', e,d);})
 */
+
