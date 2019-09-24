@@ -12,34 +12,23 @@ const store = require('@jtviegas/dyndbstore');
 
 const config = {
 
-    BUCKETWRAPPER_AWS_REGION: 'eu-west-1'
-    , BUCKETWRAPPER_AWS_ACCESS_KEY_ID: process.env.ACCESS_KEY_ID
-    , BUCKETWRAPPER_AWS_ACCESS_KEY: process.env.ACCESS_KEY
-    , BUCKETWRAPPER_TEST: {
-        aws_s3_endpoint: 'http://localhost:5000'
-    }
-
-    , DYNDBSTORE_AWS_REGION: 'eu-west-1'
+    DYNDBSTORE_AWS_REGION: 'eu-west-1'
     , DYNDBSTORE_AWS_ACCESS_KEY_ID: process.env.ACCESS_KEY_ID
     , DYNDBSTORE_AWS_ACCESS_KEY: process.env.ACCESS_KEY
-    , DYNDBSTORE_AWS_DB_ENDPOINT: 'http://localhost:8000'
+    , DYNDBSTORE_TEST: { store_endpoint: 'http://localhost:8000' }
 
-    , STORELOADER_TEST_ENTITY: 'item'
-    , STORELOADER_TEST_ENVIRONMENT: 'development'
-    , STORELOADER_TEST_RESOURCES: 'test/resources'
-
+    , APP: 'test'
+    , ENTITY: 'item'
+    , ENVIRONMENT: 'development'
 
 };
 
-const bw = require('@jtviegas/bucket-wrapper')(config);
 const index = require('../index');
 
 describe('index tests', function() {
 
     this.timeout(50000);
-    let table = commons.getTableNameV3(process.env.STORELOADER_APP
-        , config.STORELOADER_TEST_ENTITY
-        , config.STORELOADER_TEST_ENVIRONMENT);
+    let table = commons.getTableNameV3(config.APP, config.ENTITY, config.ENVIRONMENT);
 
     before(function(done) {
         try{

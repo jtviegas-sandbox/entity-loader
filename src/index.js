@@ -16,12 +16,13 @@ const CONFIGURATION_SPEC = {
     , STORELOADERSERVICE_AWS_ACCESS_KEY: 'STORELOADER_AWS_ACCESS_KEY'
 
     // testing environment
-    , STORELOADERSERVICE_BUCKETWRAPPER_TEST_aws_s3_endpoint: 'STORELOADER_BUCKETWRAPPER_TEST_aws_s3_endpoint'
-    , STORELOADERSERVICE_AWS_DB_ENDPOINT: 'STORELOADER_AWS_DB_ENDPOINT'
+    , STORELOADERSERVICE_TEST_bucket_endpoint: 'STORELOADER_TEST_bucket_endpoint'
+    , STORELOADERSERVICE_TEST_store_endpoint: 'STORELOADER_TEST_store_endpoint'
+
 };
 
 logger.info("[storeloader]...initializing store-loader module...");
-let configuration = commons.getConfiguration(CONFIGURATION_SPEC, constants, commons.handleTestVariables);
+let configuration = commons.mergeConfiguration( commons.getEnvironmentConfiguration(CONFIGURATION_SPEC, commons.handleTestVariables), constants);
 logger.info("[storeloader] configuration: %o", configuration);
 const service = require('@jtviegas/store-loader-service')(configuration);
 

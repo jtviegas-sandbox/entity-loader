@@ -26,10 +26,8 @@ export STORELOADER_AWS_REGION=$AWS_REGION
 export STORELOADER_APP=test
 export STORELOADER_AWS_ACCESS_KEY_ID=$ACCESS_KEY_ID
 export STORELOADER_AWS_ACCESS_KEY=$ACCESS_KEY
-export STORELOADER_BUCKETWRAPPER_TEST_aws_s3_endpoint="$AWS_S3_URL"
-#export STORELOADER_BUCKETWRAPPER_TEST_aws_container_name="localaws"
-export STORELOADER_AWS_DB_ENDPOINT="$AWS_DB_CONTAINER"
-
+export STORELOADER_TEST_bucket_endpoint="$AWS_S3_URL"
+export STORELOADER_TEST_store_endpoint="$AWS_DB_CONTAINER"
 
 echo "starting store loader tests..."
 
@@ -47,18 +45,16 @@ docker run --name $CONTAINER -d -e SERVICES="s3:5000,dynamodb:8000" -e DEFAULT_R
 echo "...creating testing buckets..."
 createBucket ${BUCKET} ${AWS_S3_URL}
 __r=$?
-# shellcheck disable=SC2154
-if [ ! "$__r" -eq "0" ] ; then cd "${_pwd}" && exit 1; fi
 
 if [ "$__r" -eq "0" ] ; then
   debug "...synch folder $FOLDER with bucket ${BUCKET} ..."
-  copyLocalFolderContentsToBucket "${FOLDER}" ${BUCKET} ${FILE_EXCLUDE} ${AWS_S3_URL}
+  copyLocalFolderContentsToBucket "${FOLDER}" ${BUCKET} "${FILE_EXCLUDE}" ${AWS_S3_URL}
   __r=$?
 fi
 
 if [ "$__r" -eq "0" ] ; then
   echo "...creating store table $TABLE..."
-  createTable ${TABLE} ${STORELOADER_AWS_DB_ENDPOINT}
+  createTable ${TABLE} ${STORELOADER_TEST_store_endpoint}
   __r=$?
 fi
 
@@ -73,5 +69,5 @@ echo "...stopping aws mock container..."
 docker stop $CONTAINER && docker rm $CONTAINER
 rm "${this_folder}"/aws.sh
 
-echo "...api test done. [$__r]"
+echo "...store loader test done. [$__r]"
 exit $__r
