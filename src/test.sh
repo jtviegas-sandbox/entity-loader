@@ -12,18 +12,19 @@ parent_folder=$(dirname $this_folder)
 AWS_REGION=eu-west-1
 AWS_CLI_OUTPUT_FORMAT=text
 CONTAINER=localaws
-BUCKET="test"
+APP="app"
+BUCKET=$APP
 FOLDER="$this_folder/test/resources"
 FILE_EXCLUDE="**/trigger"
 AWS_S3_URL="http://localhost:5000"
 AWS_DB_CONTAINER="http://localhost:8000"
-ENTITY="item"
+ENTITY="entity"
 ENVIRONMENT="development"
-APP="test"
-TABLE="${APP}_${ENTITY}_${ENVIRONMENT}"
+
+TABLE="${APP}-${ENVIRONMENT}-${ENTITY}"
 
 export STORELOADER_AWS_REGION=$AWS_REGION
-export STORELOADER_APP=test
+export STORELOADER_APP=store
 export STORELOADER_AWS_ACCESS_KEY_ID=$ACCESS_KEY_ID
 export STORELOADER_AWS_ACCESS_KEY=$ACCESS_KEY
 export STORELOADER_TEST_bucket_endpoint="$AWS_S3_URL"

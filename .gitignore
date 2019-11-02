@@ -68,3 +68,7 @@ devops/split4ever.include
 devops/split4ever_function_store_loader_prod.zip
 package-lock.json
 tmp/
+.terraform
+*.tfstate
+*.tfstate.backup
+store-loader.zip

@@ -9,7 +9,6 @@ curl -XGET https://raw.githubusercontent.com/jtviegas/script-utils/master/bash/a
 . "${this_folder}"/aws.sh
 # shellcheck disable=SC1090
 . "${this_folder}"/include
-
 # shellcheck disable=SC1090
 . "${this_folder}"/tenant.include
 
@@ -23,16 +22,18 @@ __r=0
 GROUP_SYS="${TENANT}_system_group"
 ROLE_STORE_UPDATE="${TENANT}_store_update_role"
 POLICY_LOGS="${TENANT}_logs_policy"
-BUCKET_ENTITIES="${TENANT}-${ENTITY}"
+BUCKET_ENTITIES="${TENANT}-ENTITIES"
 POLICY_BUCKETS_USER="${TENANT}_policy_for_buckets_user"
 POLICY_BUCKETS_GENERAL_USER="${TENANT}_policy_for_buckets_general_user"
 BUCKETS_ARN="arn:aws:s3:::${BUCKET_ENTITIES},arn:aws:s3:::${BUCKET_ENTITIES}/*"
 POLICY_BUCKETS_FUNCTION="${TENANT}_policy_for_buckets_function"
 POLICY_TABLES="${TENANT}_policy_for_tables_update"
+
 TABLE_PROD="${TENANT}_${ENTITY}_${ENV_PROD}"
 TABLE_DEV="${TENANT}_${ENTITY}_${ENV_DEV}"
 TABLES="${TABLE_PROD} ${TABLE_DEV}"
 TABLES_ARN="arn:aws:dynamodb:::table/${TABLE_PROD},arn:aws:dynamodb:::table/${TABLE_DEV}"
+
 FUNCTION_STORE_LOADER="${TENANT}_function_store_loader"
 FUNCTION_PERMISSION_ID="${TENANT}_001"
 DEV_FUNCTION_EVENT_ID="${TENANT}_store_loader_event_dev"
@@ -40,18 +41,26 @@ PROD_FUNCTION_EVENT_ID="${TENANT}_store_loader_event_prod"
 
 info "setting up $PROJ..."
 
-
-createBucket ${BUCKET_ENTITIES}
+isBucket ${BUCKET_ENTITIES}
 __r=$?
-if [[ ! "$__r" -eq "0" ]] ; then cd ${_pwd} && exit 1; fi
+if [[ ! "$__r" -eq "0" ]] ; then
+  createBucket ${BUCKET_ENTITIES}
+  __r=$?
+  if [[ ! "$__r" -eq "0" ]] ; then cd ${_pwd} && exit 1; fi
 
-debug "...adding folders to bucket ${BUCKET_ENTITIES} ..."
-for f in ${BUCKET_ENTITIES_FOLDERS}; do
-    aws s3api put-object --bucket ${BUCKET_ENTITIES} --key ${f}
-    __r=$?
-    if [[ ! "$__r" -eq "0" ]] ; then cd ${_pwd} && exit 1; fi
-    info "...added folder $f to bucket $BUCKET_ENTITIES..."
-done
+  debug "...adding folders to bucket ${BUCKET_ENTITIES} ..."
+  for f in ${BUCKET_ENTITIES_FOLDERS}; do
+      aws s3api put-object --bucket ${BUCKET_ENTITIES} --key ${f}
+      __r=$?
+      if [[ ! "$__r" -eq "0" ]] ; then cd ${_pwd} && exit 1; fi
+      info "...added folder $f to bucket $BUCKET_ENTITIES..."
+  done
+
+fi
+
+
+
+
 
 debug "...creating tables ..."
 for t in ${TABLES}; do

@@ -17,8 +17,8 @@ const config = {
     , DYNDBSTORE_AWS_ACCESS_KEY: process.env.ACCESS_KEY
     , DYNDBSTORE_TEST: { store_endpoint: 'http://localhost:8000' }
 
-    , APP: 'test'
-    , ENTITY: 'item'
+    , APP: 'app'
+    , ENTITY: 'entity'
     , ENVIRONMENT: 'development'
 
 };
@@ -28,7 +28,7 @@ const index = require('../index');
 describe('index tests', function() {
 
     this.timeout(50000);
-    let table = commons.getTableNameV3(config.APP, config.ENTITY, config.ENVIRONMENT);
+    let table = commons.getTableNameV4(config.APP, config.ENTITY, config.ENVIRONMENT);
 
     before(function(done) {
         try{
@@ -49,14 +49,12 @@ describe('index tests', function() {
                         "eventSource": "aws:s3",
                         "awsRegion": "eu-west-1",
                         "s3": {
-                            "s3SchemaVersion": "1.0",
-                            "configurationId": "split4ever_store_loader_event_dev",
-                            "bucket": {
-                                "name": "test",
-                                "arn": "arn:aws:s3:::split4ever-items"
+                            "s3SchemaVersion": "1.0"
+                            ,"bucket": {
+                                "name": "app"
                             },
                             "object": {
-                                "key": "item/development/trigger"
+                                "key": "entity/development/trigger"
                             }
                         }
                     }

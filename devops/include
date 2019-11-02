@@ -1,4 +1,4 @@
-PROJ=store-loader
+APP=storeloader
 
 ROLE_ASSUMING_POLICY_FILENAME=role_assuming.policy
 POLICY_LOGS_ACTIONS="logs:*"
@@ -8,7 +8,7 @@ BUCKETS_USER_GENERAL_ACTIONS="s3:ListAllMyBuckets,s3:HeadBucket,iam:ChangePasswo
 BUCKETS_FUNCTION_ACTIONS="s3:*"
 POLICY_TABLES_ACTIONS="dynamodb:*"
 AWS_SDK_MODULE_PATH=node_modules/aws-sdk
-BUCKET_ENTITIES_FOLDERS="development/ production/"
+BUCKET_ENTITIES_FOLDERS="development/ production/ test/"
 
 FUNCTION_HANDLER=index.handler
 FUNCTION_RUNTIME=nodejs8.10
@@ -17,5 +17,5 @@ FUNCTION_MEMORY=1024
 FUNCTION_PRINCIPAL=s3.amazonaws.com
 FUNCTION_LOADER_ACTIONS="lambda:InvokeFunction"
 
-ENV_PROD=pro
-ENV_DEV=dev
+# ENV_PROD=pro
+# ENV_DEV=dev

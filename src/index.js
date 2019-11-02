@@ -10,8 +10,8 @@ const constants = {
     , STORELOADER_ENVIRONMENTS: ['production','development','test']
 };
 const CONFIGURATION_SPEC = {
-    STORELOADER_APP: 'STORELOADER_APP'
-    , STORELOADERSERVICE_AWS_REGION: 'STORELOADER_AWS_REGION'
+    // STORELOADER_APP: 'STORELOADER_APP'
+    STORELOADERSERVICE_AWS_REGION: 'STORELOADER_AWS_REGION'
     , STORELOADERSERVICE_AWS_ACCESS_KEY_ID: 'STORELOADER_AWS_ACCESS_KEY_ID'
     , STORELOADERSERVICE_AWS_ACCESS_KEY: 'STORELOADER_AWS_ACCESS_KEY'
 
@@ -59,7 +59,7 @@ exports.handler = (event, context, callback) => {
         if( null === environment  || null === entity || null === bucket )
             throw new ServerError("event must provide 'entity', 'environment' and 'bucket'", 400);
 
-        service.load(configuration.STORELOADER_APP, entity, environment, bucket, done);
+        service.load(bucket, entity, environment, bucket, done);
 
     }
     catch(error) {
