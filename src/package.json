@@ -29,12 +29,12 @@
     "winston": "^3.2.1"
   },
   "devDependencies": {
-    "@jtviegas/bucket-wrapper": "latest",
+    "@jtviegas/bucket-wrapper": "0.0.8",
     "@jtviegas/dyndbstore": "latest",
     "chai": "^4.2.0",
-    "coveralls": "^3.0.6",
-    "handlebars": "^4.3.1",
+    "coveralls": "^3.0.7",
+    "handlebars": "^4.5.1",
     "istanbul": "^0.4.5",
-    "mocha": "^6.1.4"
+    "mocha": "^6.2.2"
   }
 }
