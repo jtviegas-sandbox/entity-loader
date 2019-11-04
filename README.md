@@ -24,7 +24,7 @@ that will trigger the loading process.
 The bucket folder structure, can be exemplified as in:
 
     /
-      products/
+      parts/
           data.spec
           1_1.png
           1_2.png
