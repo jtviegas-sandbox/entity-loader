@@ -64,8 +64,8 @@ typings/
 notification.json
 tenant.js
 split4ever.js
-devops/split4ever.include
-devops/split4ever_function_store_loader_prod.zip
+platform/split4ever.include
+platform/split4ever_function_store_loader_prod.zip
 package-lock.json
 tmp/
 .terraform

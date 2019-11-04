@@ -1,49 +1,39 @@
-
 variable "environment" {
   description = "the deployment environment"
-  # string, number, bool, list, map, set, object, tuple, and any
+  # dev | pro
   type        = string
-  default     = "development"
+  # default     = "dev"
 }
 
 variable "app" {
   description = "the app"
   # string, number, bool, list, map, set, object, tuple, and any
   type        = string
-  default     = "store"
-}
-
-variable "prefix" {
-  description = "the resources common prefix"
-  # string, number, bool, list, map, set, object, tuple, and any
-  type        = string
-  default     = "store-development"
+  # default     = "store"
 }
 
 variable "maintainer-1" {
   description = "a maintainer user"
   # string, number, bool, list, map, set, object, tuple, and any
   type        = string
-  default     = "rocha"
+  # default     = "rocha"
 }
 
 variable "maintainer-2" {
   description = "a maintainer user"
   # string, number, bool, list, map, set, object, tuple, and any
   type        = string
-  default     = "tiago"
+  # default     = "tiago"
 }
 
 variable "maintainer-public-key" {
   description = "maintainers public key to encrypt password, using keybase one"
   # string, number, bool, list, map, set, object, tuple, and any
   type        = string
-  default     = "keybase:jtviegas"
+  # default     = "keybase:jtviegas"
 }
 
-variable "store-bucket-event-function-artifact" {
-  description = "store bucket update function artifact location"
-  # string, number, bool, list, map, set, object, tuple, and any
+variable "s3-bucket-entities_id" {
+  description = "id of the entitties bucket"
   type        = string
-  default     = "../../src/store-loader.zip"
 }

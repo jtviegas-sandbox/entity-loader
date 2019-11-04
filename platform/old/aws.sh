@@ -11,7 +11,7 @@ STATE_CREATING_CODE=3
 STATE_DELETING_CODE=2
 STATE_MISSING_CODE=1
 
-#LOG_TRACE=TRUE
+LOG_TRACE=TRUE
 
 debug(){
     local __msg="$1"
@@ -34,7 +34,7 @@ err(){
 }
 
 goin(){
-    if [[ ! -z $LOG_TRACE ]]; then
+    if [ ! -z $LOG_TRACE ]; then
         local __msg="$1"
         local __params="$2"
         echo "\n [IN]    `date` ___ $__msg [$__params]\n"
@@ -42,7 +42,7 @@ goin(){
 }
 
 goout(){
-    if [[ ! -z $LOG_TRACE ]]; then
+    if [ ! -z $LOG_TRACE ]; then
         local __msg="$1"
         local __outcome="$2"
         echo "\n [OUT]   `date` ___ $__msg [$__outcome]\n"
@@ -52,6 +52,12 @@ goout(){
 stat()
 {
     goin "stat"
+    
+    local __aws_url=$1
+    local _aws_url_option=""
+    if [ ! -z "$__aws_url" ]; then
+        _aws_url_option="--endpoint-url=$__aws_url"
+    fi
     
     info "current buckets:"
     aws s3 ls
@@ -65,15 +71,23 @@ stat()
 
 getTableState()
 {
-    goin "getTableState" $1
+    goin "getTableState" "$1 $2"
     local __r=${STATE_MISSING_CODE}
     local __table=$1
-    local __s=`aws dynamodb describe-table --output text --table-name ${__table} | grep "^TABLE" | awk '{print $8}'`
-    if [[ ! -z "$__s" ]]; then
-        if [[ "$__s" = ${STATE_DELETING} ]]; then __r=${STATE_DELETING_CODE}; fi
-        if [[ "$__s" = "$STATE_CREATING" ]]; then __r=${STATE_CREATING_CODE}; fi
-        if [[ "$__s" = "$STATE_UPDATING" ]]; then __r=${STATE_UPDATING_CODE}; fi
-        if [[ "$__s" = "$STATE_ACTIVE" ]]; then __r=${STATE_ACTIVE_CODE}; fi
+    
+    local __aws_url=$2
+    local __s=
+    if [ ! -z "$__aws_url" ]; then
+      __s=`aws dynamodb describe-table --output text --table-name ${__table} --endpoint-url="${__aws_url}" | grep "^TABLE" | awk '{print $7}'`
+    else
+      __s=`aws dynamodb describe-table --output text --table-name ${__table} | grep "^TABLE" | awk '{print $8}'`
+    fi
+
+    if [ ! -z "$__s" ]; then
+        if [ "$__s" = ${STATE_DELETING} ]; then __r=${STATE_DELETING_CODE}; fi
+        if [ "$__s" = "$STATE_CREATING" ]; then __r=${STATE_CREATING_CODE}; fi
+        if [ "$__s" = "$STATE_UPDATING" ]; then __r=${STATE_UPDATING_CODE}; fi
+        if [ "$__s" = "$STATE_ACTIVE" ]; then __r=${STATE_ACTIVE_CODE}; fi
     else
         __s=${STATE_MISSING}
     fi
@@ -83,19 +97,21 @@ getTableState()
 
 checkTableExistence()
 {
-    goin "checkTableExistence" $1
+    goin "checkTableExistence" "$1 $2"
     local __r=1
     local __table=$1
     
+    local __aws_url=$2
+    
     local __s=0
-    while [[ "$__s" -ne "$STATE_MISSING_CODE" ]] && [[ "$__s" -ne "$STATE_ACTIVE_CODE" ]]
+    while [ "$__s" -ne "$STATE_MISSING_CODE" ] && [ "$__s" -ne "$STATE_ACTIVE_CODE" ]
     do
-        getTableState "$__table"
+        getTableState "$__table" "$__aws_url"
         __s=$?
         sleep 6
     done
 
-    if [[ "$__s" -eq "$STATE_MISSING_CODE" ]]
+    if [ "$__s" -eq "$STATE_MISSING_CODE" ]
     then
         __r=0
     fi
@@ -109,10 +125,12 @@ waitForNoTableState()
     goin "waitForNoTableState" $1
     local __table=$1
     
+    local __aws_url=$2
+    
     local __s=0
-    while [[ "$__s" -ne "$STATE_MISSING_CODE" ]]
+    while [ "$__s" -ne "$STATE_MISSING_CODE" ]
     do
-        getTableState "$__table"
+        getTableState "$__table $__aws_url"
         __s=$?
         sleep 6
     done
@@ -125,17 +143,23 @@ deleteTable()
     local __r=0
     local __table=$1
     
-    checkTableExistence "$__table"
+    local __aws_url=$2
+    local _aws_url_option=""
+    if [ ! -z "$__aws_url" ]; then
+        _aws_url_option="--endpoint-url=$__aws_url"
+    fi
+    
+    checkTableExistence "$__table $__aws_url"
     local __s=$?
     
-    if [[ "$__s" -eq "0" ]]; then
+    if [ "$__s" -eq "0" ]; then
         warn "table $__table is not there"
     else
-        aws dynamodb delete-table --table-name $__table    
+        aws $_aws_url_option dynamodb delete-table --table-name $__table    
         __r=$?
-        if [[ "$__r" -eq "0" ]]
+        if [ "$__r" -eq "0" ]
         then 
-            waitForNoTableState "$__table"
+            waitForNoTableState "$__table $__aws_url"
             info "table $__table not there anymore"
         fi
     fi
@@ -146,14 +170,15 @@ deleteTable()
 
 waitForTableState()
 {
-    goin "waitForTableState" $1
+    goin "waitForTableState" "$1 $2 $3"
     local __table=$1
-    local __state=$2
+    local __state=$2    
+    local __aws_url=$3
     
     local __s=0
-    while [[ ! "$__s" -eq "$__state" ]]
+    while [ ! "$__s" -eq "$__state" ]
     do
-        getTableState "$__table"
+        getTableState "$__table" "$__aws_url"
         __s=$?
         sleep 6
     done
@@ -163,17 +188,23 @@ waitForTableState()
 
 createTable()
 {
-    goin "createTable" $1
+    goin "createTable" "$1 $2"
     local __r=0
     local __table=$1
-
-    checkTableExistence "$__table"
+    
+    local __aws_url=$2
+    local _aws_url_option=""
+    if [ ! -z "$__aws_url" ]; then
+        _aws_url_option="--endpoint-url=$__aws_url"
+    fi
+    sleep 6
+    checkTableExistence "$__table" "$__aws_url"
     local __s=$?
-    if [[ ! "$__s" -eq "0" ]]; then
+    if [ ! "$__s" -eq "0" ]; then
         warn "table $__table already there"
         __r=0
     else
-        aws dynamodb create-table --table-name $__table --attribute-definitions '[{"AttributeName":"id","AttributeType":"N"}]' --key-schema '[{"AttributeName":"id","KeyType":"HASH"}]'  --provisioned-throughput '{"ReadCapacityUnits":5, "WriteCapacityUnits":5}'
+        aws $_aws_url_option dynamodb create-table --table-name $__table --attribute-definitions '[{"AttributeName":"id","AttributeType":"N"}]' --key-schema '[{"AttributeName":"id","KeyType":"HASH"}]'  --provisioned-throughput '{"ReadCapacityUnits":5, "WriteCapacityUnits":5}'
         
         # --global-secondary-indexes '[ { "IndexName": "IDX_NUM", "KeySchema":[ { "AttributeName": "number", "KeyType": "RANGE" } ] , "Projection":{"ProjectionType": "ALL"}, "ProvisionedThroughput":{"ReadCapacityUnits": 5, "WriteCapacityUnits":1} }, { "IndexName": "IDX_NUM", "KeySchema":[ { "AttributeName": "number", "KeyType": "RANGE" } ] , "Projection":{"ProjectionType": "ALL"}, "ProvisionedThroughput":{"ReadCapacityUnits": 5, "WriteCapacityUnits":1} } ]'
             
@@ -181,8 +212,8 @@ createTable()
         #aws dynamodb create-table --table-name $__table --attribute-definitions AttributeName=id,AttributeType=S AttributeName=n,AttributeType=N --key-schema AttributeName=id,KeyType=HASH AttributeName=n,KeyType=RANGE --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 --local-secondary-indexes IndexName=N KeySchema=AttributeName=n,KeyType=number
         
         __r=$?
-        if [[ "$__r" -eq "0" ]]; then
-                waitForTableState "$__table" "$STATE_ACTIVE_CODE"
+        if [ "$__r" -eq "0" ]; then
+                waitForTableState "$__table" "$STATE_ACTIVE_CODE" "$__aws_url"
                 info "created table $__table"
         else
             __r=1
@@ -194,39 +225,125 @@ createTable()
 
 createBucket()
 {
-    goin "createBucket" $1
+    goin "createBucket" "$1 $2"
     local __bucketName=$1
-    __bucket="s3://$__bucketName"
-    aws s3 ls | grep $__bucket
+    local __aws_url=$2
+    
+    isBucket "$__bucketName" "$__aws_url"
     local __r=$?
-    if [[ "$__r" -eq "0" ]]
+    if [ "$__r" -eq "0" ]
     then
         warn "found bucket $__bucket already created"
         __r=0
     else
-        aws s3 mb $__bucket
+        __bucket="s3://$__bucketName"
+        local _aws_url_option=""
+        if [ ! -z "$__aws_url" ]; then
+            _aws_url_option="--endpoint-url=$__aws_url"
+        fi
+        aws $_aws_url_option s3 mb $__bucket
         __r=$?
-        if [[ ! "$__r" -eq "0" ]] ; then warn "could not create bucket $__bucket"; else info "created bucket $__bucket" ; fi
+        if [ ! "$__r" -eq "0" ] ; then warn "could not create bucket $__bucket"; else info "created bucket $__bucket" ; fi
     fi
     goout "createBucket" "$__r"
     return $__r
 }
 
+isBucket()
+{
+    goin "isBucket" "$1 $2"
+    local __bucketName=$1
+    
+    __bucket="s3://$__bucketName"
+    
+    local __aws_url=$2
+    local _aws_url_option=""
+    if [ ! -z "$__aws_url" ]; then
+        _aws_url_option="--endpoint-url=$__aws_url"
+    fi
+
+    aws $_aws_url_option s3 ls | grep $__bucket
+    local __r=$?
+
+    goout "isBucket" "$__r"
+    return $__r
+}
+
+
+createFolderInBucket()
+{
+    goin "createFolderInBucket" "$1 $2 $3"
+    local __bucketName=$1
+    local __folderName=$2
+    local __aws_url=$3
+    local _aws_url_option=""
+    if [ ! -z "$__aws_url" ]; then
+        _aws_url_option="--endpoint-url=$__aws_url"
+    fi
+
+    aws $_aws_url_option s3  ls $__bucketName | grep $__folderName
+    local __r=$?
+    if [ "$__r" -eq "0" ]
+    then
+        warn "found $__folderName already created in bucket $__bucketName"
+        __r=0
+    else
+        aws $_aws_url_option s3api put-object --bucket $__bucketName --key $__folderName
+        __r=$?
+        if [ ! "$__r" -eq "0" ] ; then warn "could not create folder $__folderName in bucket $__bucketName"; else info "created folder $__folderName in bucket $__bucketName" ; fi
+    fi
+
+    goout "createFolderInBucket" "$__r"
+    return $__r
+}
+
+copyLocalFolderContentsToBucket()
+{
+    goin "copyLocalFolderContentsToBucket" "$1 $2 $3 $4"
+    local __folder=$1
+    local __bucketName=$2
+    local __exclude=$3
+    local __aws_url=$4
+    local _aws_url_option=""
+    if [ ! -z "$__aws_url" ]; then
+        _aws_url_option="--endpoint-url=$__aws_url"
+    fi
+    
+    aws $_aws_url_option s3 sync $__folder "s3://$__bucketName" --delete --exclude "$__exclude"
+    local __r=$?
+    if [ "$__r" -eq "0" ]
+    then
+        info "synch'ed $__folder with bucket $__bucketName"
+        aws $_aws_url_option s3  ls $__bucketName
+    else
+        warn "could not synch $__folder with bucket $__bucketName"
+    fi
+
+    goout "copyLocalFolderContentsToBucket" "$__r"
+    return $__r
+}
 
 deleteBucket()
 {
     goin "deleteBucket" $1
     local __bucketName=$1
     __bucket="s3://$__bucketName"
-    aws s3 ls | grep $__bucketName
+    
+    local __aws_url=$2
+    local _aws_url_option=""
+    if [ ! -z "$__aws_url" ]; then
+        _aws_url_option="--endpoint-url=$__aws_url"
+    fi
+    
+    aws $_aws_url_option s3 ls | grep $__bucketName
     local __r=$?
-    if [[ "$__r" -ne "0" ]]; then
+    if [ "$__r" -ne "0" ]; then
         warn "couldn't find bucket $__bucket, not there"
         __r=0
     else
-        aws s3 rb $__bucket --force
+        aws $_aws_url_option s3 rb $__bucket --force
         __r=$?
-        if [[ ! "$__r" -eq "0" ]] ; then warn "! could not delete bucket $__bucket !"; else info "deleted bucket $__bucket" ; fi
+        if [ ! "$__r" -eq "0" ] ; then warn "! could not delete bucket $__bucket !"; else info "deleted bucket $__bucket" ; fi
     fi
     goout "deleteBucket" $__r
     return $__r
@@ -244,7 +361,7 @@ createPolicyForBucket()
     sed  "s/.*\"Resource\": \[ XXXYYYZZZ \].*/\t\t\"Resource\": \[ $store_buckets_resource \]/" $this_folder/$policy.policy > $this_folder/$policy.json
     aws iam create-policy --policy-name $policy --policy-document file://$this_folder/$policy.json
     local __r=$?
-    if [[ ! "$__r" -eq "0" ]] ; then warn "could not create policy $policy"; else info "created policy $policy" ; fi
+    if [ ! "$__r" -eq "0" ] ; then warn "could not create policy $policy"; else info "created policy $policy" ; fi
     rm $this_folder/${policy}.json
 
     goout "createPolicyForBucket" $__r
@@ -258,7 +375,7 @@ deletePolicy()
     
     __r=0
     arn=`aws iam list-policies --output text | grep ${policy} | awk '{print $2}'`
-    if [[ -z "$arn" ]]
+    if [ -z "$arn" ]
     then 
         warn "could not find policy arn for $policy"
         __r=1
@@ -269,7 +386,7 @@ deletePolicy()
             if [ ! "$?" -eq "0" ] ; then warn "could not delete policy $policy version $v"; else info "deleted policy $policy version $v" ; fi
         done
         aws iam delete-policy --policy-arn $arn
-        if [[ ! "$?" -eq "0" ]] ; then warn "could not delete policy $policy"; else info "deleted policy $policy" ; fi
+        if [ ! "$?" -eq "0" ] ; then warn "could not delete policy $policy"; else info "deleted policy $policy" ; fi
     fi
     goout "deletePolicy" ${__r}
     return $__r
@@ -291,7 +408,7 @@ createPolicyForBucketAndTable()
     
     aws iam create-policy --policy-name $policy --policy-document file://$this_folder/$policy.json
     __r=$? 
-    if [[ ! "$__r" -eq "0" ]] ; then error "could not create policy $policy"; else info "created policy $policy" ; fi
+    if [ ! "$__r" -eq "0" ] ; then error "could not create policy $policy"; else info "created policy $policy" ; fi
     rm $this_folder/${policy}.json
 
     goout "createPolicyForBucketAndTable" $__r
@@ -611,7 +728,7 @@ removePermissionFromFunction()
     
     aws lambda remove-permission --function-name ${__function} --statement-id ${__statement_id}
     __r=$?
-    if [[ ! "$__r" -eq "0" ]] ; then
+    if [ ! "$__r" -eq "0" ] ; then
         warn "could not remove permission from function $__function"
     else 
         info "removed permission from function $__function"
@@ -631,7 +748,7 @@ createPolicy()
     echo "$_spec" > $this_folder/$_name.json
     aws iam create-policy --policy-name $_name --policy-document file://$this_folder/${_name}.json
     local __r=$?
-    if [[ ! "$__r" -eq "0" ]] ; then warn "could not create policy $_name"; else info "created policy $_name" ; fi
+    if [ ! "$__r" -eq "0" ] ; then warn "could not create policy $_name"; else info "created policy $_name" ; fi
     rm $this_folder/${_name}.json
 
     goout "createPolicy" $__r
@@ -652,7 +769,7 @@ buildPolicy()
     local _actions_str=
     for _action in $(echo ${__actions} | tr "," "\n")
     do
-        if [[ -z ${_actions_str} ]]; then
+        if [ -z ${_actions_str} ]; then
             _actions_str="\"$_action\""
         else
             _actions_str="$_actions_str,\"$_action\""
@@ -660,12 +777,12 @@ buildPolicy()
     done
     
     local _resources_str=
-    if [[ -z ${__resources} ]]; then
+    if [ -z ${__resources} ]; then
         _resources_str="\"*\""
     else
         for _resource in $(echo ${__resources} | tr "," "\n")
         do
-            if [[ -z ${_resources_str} ]]; then
+            if [ -z ${_resources_str} ]; then
                 _resources_str="\"$_resource\""
             else
                 _resources_str="$_resources_str,\"$_resource\""
@@ -687,7 +804,7 @@ deleteStack()
     
     aws cloudformation delete-stack --stack-name $__stack
     __r=$?
-    if [[ ! "$__r" -eq "0" ]] ; then
+    if [ ! "$__r" -eq "0" ] ; then
         warn "could not delete stack $__stack"
     else 
         info "deleted stack $__stack"
@@ -696,6 +813,67 @@ deleteStack()
     goout "deleteStack" $__r
     return $__r
 }
+
+install_pip3()
+{
+    goin "install_pip3"
+    local __r=0
+    
+    curl -O https://bootstrap.pypa.io/get-pip.py
+    python3 get-pip.py --user
+    __r=$?
+    if [ ! "$__r" -eq "0" ] ; then
+        err "couldn't install pip3"
+    else 
+        #export PATH=~/.local/bin:$PATH
+        info "installed pip3"
+    fi
+    goout "install_pip3" $__r
+    return $__r
+}
+
+aws_init()
+{
+    goin "aws_init"
+    local __r=0
+    local __region=$1
+    local __output=$2
+    
+    info "!!! be sure the environment is providing with AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY variables !!!"
+    
+    aws --version
+    __r=$?
+    if [ ! "$__r" -eq "0" ] ; then
+        info "installing awscli"
+        pip3 --version
+        __r=$?
+        if [ ! "$__r" -eq "0" ] ; then
+            info "installing pip3"
+            install_pip3
+            __r=$?
+        fi
+        if [ "$__r" -eq "0" ] ; then
+            pip3 install awscli --upgrade --user
+            __r=$?
+            if [ ! "$__r" -eq "0" ] ; then
+                err "couldn't install awscli"
+            else 
+                info "installed awscli"
+                aws configure set region $__region
+                aws configure set output $__output
+                info "configured awscli"
+            fi
+        fi
+        
+    else 
+        info "aws-cli is here"
+    fi
+ 
+    goout "aws_init" $__r
+    return $__r
+}
+
+
 
 # result=$(buildPolicy Allow "iam:ChangePassword,s3:ListBucketByTags" "*")
 # echo $result

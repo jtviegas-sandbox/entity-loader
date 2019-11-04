@@ -48,7 +48,7 @@ exports.handler = (event, context, callback) => {
                 let bucketNameElements = record.s3.bucket.name.split("-");
                 app = bucketNameElements[0];
                 environment = bucketNameElements[1];
-                if( -1 >= configuration.STORELOADER_ENVIRONMENTS.indexOf(environment) )
+                if( -1 >= configuration.STORELOADER_ENVIRONMENTS.indexOf(environment) ){}
                     throw new ServerError(`wrong environment: "${environment}"`, 400);
                 bucket = record.s3.bucket.name;
                 break;
