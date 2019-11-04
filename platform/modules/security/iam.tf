@@ -120,7 +120,7 @@ resource "aws_iam_policy" "iam-policy-buckets-event-function" {
     }
     , {
       "Effect": "Allow",
-      "Resource": "arn:aws:dynamodb:::table/*",
+      "Resource": "arn:aws:dynamodb:*:*:table/*",
       "Action": "dynamodb:*"
     }
   ]

@@ -36,6 +36,7 @@ if [ "$2" == "deploy" ]; then
       rm -rf "$AWS_SDK_MODULE_PATH"
   fi
 
+  rm -f "${SRC_DIR}/${FUNCTION_NAME}.zip"
   zip -9 -r "${SRC_DIR}/${FUNCTION_NAME}.zip" index.js node_modules &>/dev/null
   __r=$?
   if [[ ! "$__r" -eq "0" ]] ; then cd "${_pwd}" && exit 1; fi
@@ -60,9 +61,7 @@ if [ "$2" == "undeploy" ]; then
 
   echo "...doing terraform scripts destroy with env: $1"
   cd "${run_folder}"
-
   terraform destroy -auto-approve -lock=true -lock-timeout=300s
-
   echo "...terraform scripts done..."
 
 fi
