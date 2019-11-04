@@ -7,7 +7,7 @@ const logger = winston.createLogger(commons.getDefaultWinstonConfig());
 
 const constants = {
     STORELOADERSERVICE_DATA_DESCRIPTOR_FILE: 'data.spec'
-    , STORELOADER_ENVIRONMENTS: ['production','development','test']
+    , STORELOADER_ENVIRONMENTS: ['pro','dev']
 };
 const CONFIGURATION_SPEC = {
     STORELOADERSERVICE_AWS_REGION: 'STORELOADER_AWS_REGION'
@@ -48,15 +48,20 @@ exports.handler = (event, context, callback) => {
                 let bucketNameElements = record.s3.bucket.name.split("-");
                 app = bucketNameElements[0];
                 environment = bucketNameElements[1];
-                if( -1 >= configuration.STORELOADER_ENVIRONMENTS.indexOf(environment) ){}
+                if( -1 >= configuration.STORELOADER_ENVIRONMENTS.indexOf(environment) ){
+                    logger.warn('[storeloader|handler] wrong environment: %s)', environment);
                     throw new ServerError(`wrong environment: "${environment}"`, 400);
+                }
+
                 bucket = record.s3.bucket.name;
                 break;
             }
         }
 
-        if( null === environment  || null === app || null === bucket )
+        if( null === environment  || null === app || null === bucket ){
+            logger.warn('[storeloader|handler] wrong input => environment:%s | app:%s | bucket:%s)', environment, app, bucket);
             throw new ServerError("event must provide 'entity1', 'environment' and 'bucket'", 400);
+        }
 
         service.load(app, environment, bucket, done);
 

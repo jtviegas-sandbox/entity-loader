@@ -19,7 +19,7 @@ const config = {
 
     , APP: 'app'
     , ENTITIES: ['entity1','entity2']
-    , ENVIRONMENT: 'development'
+    , ENVIRONMENT: 'dev'
 
 };
 
