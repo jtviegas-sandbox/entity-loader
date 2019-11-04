@@ -50,7 +50,7 @@ and then place the trigger file in the root folder.
   - End products:
     - all the entities will be reflected in entries in the table, and the images will contain a link to the image in the bucket folder;
     - example:
-    ```json
+    ```
         { 
         id: 1,
         number: 1,
