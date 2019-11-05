@@ -15,10 +15,11 @@ Current implementation uses aws S3 and DynamoDB.
 
 ### description
 
-A service that loads a folder contents (items described by `data.spec` file and related 
-```[0-9]*_[0-9]*\.{jpg|png|gif}``` image files) from a bucket into a data store.
-Currently the table in the data store will be named after the first level bucket folder, 
-which by itself will define the items name, as in ```${app}_${foldername=entities_name}_${env}```.
+A service that loads entities from folders in a bucket (elements described by `data.spec` file and related 
+```[0-9]*_[0-9]*\.{jpg|png|gif}``` image files) into a table.
+
+Currently the entities, and therefore the tables in the data store, will be named after the app, the bucket folder name and its environment,
+ as in ```${app}_${foldername=entity}_${env}```.
 There will be also a ```trigger``` file, that should be created in the root folder to generate an event
 that will trigger the loading process.
 The bucket folder structure, can be exemplified as in:
@@ -36,8 +37,8 @@ The bucket folder structure, can be exemplified as in:
           2.1.png
       trigger
           
-So, to load the data into a cloud data store, currently aws dynamodb, one should create the folders and content
-and then place the trigger file in the root folder.
+So, to load the data into a table (currently `aws dynamodb`) one should create a folder, named after the entity name (ex: `parts`), and dump the content inside it, e.g., the `data.spec` file explaining the data elements and the image files named according to the element name and image index (ex: `1_2.png` being the second image of element 1),
+and then place the trigger file in the root folder to trigger the upload process.
 
 ### procedure
   - edit the variables in `platform/pro/main.tf` and in `platform/dev/main.tf`;
@@ -48,7 +49,7 @@ and then place the trigger file in the root folder.
   - dump the entities folders and content in the buckets;
   - dump the `trigger` file in the root;
   - End products:
-    - all the entities will be reflected in entries in the table, and the images will contain a link to the image in the bucket folder;
+    - all the entities will be now entries in the table, and the images will be linked to the images in the bucket folder;
     - example:
     ```
         { 
