@@ -17,7 +17,6 @@ const CONFIGURATION_SPEC = {
     // testing environment
     , STORELOADERSERVICE_TEST_bucket_endpoint: 'STORELOADER_TEST_bucket_endpoint'
     , STORELOADERSERVICE_TEST_store_endpoint: 'STORELOADER_TEST_store_endpoint'
-
 };
 
 logger.info("[storeloader]...initializing store-loader module...");
@@ -46,13 +45,12 @@ exports.handler = (event, context, callback) => {
             let record = event.Records[i];
             if( record.s3 && record.s3.bucket && record.s3.bucket.name && record.s3.object && record.s3.object.key){
                 let bucketNameElements = record.s3.bucket.name.split("-");
-                app = bucketNameElements[0];
-                environment = bucketNameElements[1];
+                environment = bucketNameElements[bucketNameElements.length-2];
+                app = record.s3.bucket.name.substr(0, record.s3.bucket.name.indexOf(`-${environment}`));
                 if( -1 >= configuration.STORELOADER_ENVIRONMENTS.indexOf(environment) ){
                     logger.warn('[storeloader|handler] wrong environment: %s)', environment);
                     throw new ServerError(`wrong environment: "${environment}"`, 400);
                 }
-
                 bucket = record.s3.bucket.name;
                 break;
             }

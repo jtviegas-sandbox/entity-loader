@@ -12,7 +12,6 @@ module "bucket-event-handling" {
   function-artifact = "../../artifacts/${var.app}.zip"
   function-name = "${var.app}-${var.env}-function"
   notification-name = "${var.app}-${var.env}-statement"
-
 }
 
 module "table-parts" {
