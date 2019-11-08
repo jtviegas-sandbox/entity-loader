@@ -7,14 +7,19 @@ provider "aws" {
 module "bucket-event-handling" {
   source = "./modules/bucket-event-handling"
 
-  bucket-name = "${var.app}-${var.env}-bucket"
-  table-name = "${var.app}-${var.env}-parts"
+  bucket-name = "${var.app}-${var.env}-entities"
   function-role-name = "${var.app}-${var.env}-function-role"
-  function-artifact = "../../artifacts/store-loader.zip"
+  function-artifact = "../../artifacts/${var.app}.zip"
   function-name = "${var.app}-${var.env}-function"
   notification-name = "${var.app}-${var.env}-statement"
 
 }
+
+module "table-parts" {
+  source = "./modules/simple-table"
+  name = "${var.app}-${var.env}-parts"
+}
+
 
 terraform {
   backend "s3" {
