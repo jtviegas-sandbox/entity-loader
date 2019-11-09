@@ -14,11 +14,6 @@ module "bucket-event-handling" {
   notification-name = "${var.app}-${var.env}-statement"
 }
 
-module "table-parts" {
-  source = "./modules/simple-table"
-  name = "${var.app}-${var.env}-parts"
-}
-
 terraform {
   backend "s3" {
     bucket         = "store-loader-pro-terraform-state"
