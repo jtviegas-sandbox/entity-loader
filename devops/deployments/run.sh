@@ -2,7 +2,10 @@
 
 MODULES_DIR=modules
 MODULES_URL=https://github.com/jtviegas/terraform-modules/trunk/modules
-this_folder="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+this_folder=$(dirname $(readlink -f $0))
+if [ -z  $this_folder ]; then
+  this_folder="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+fi
 parent_folder=$(dirname $this_folder)
 BUILD_SCRIPT=${parent_folder}/build.sh
 
