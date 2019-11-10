@@ -22,6 +22,10 @@ npm install &>/dev/null
 if [ -d "${AWS_SDK_MODULE_PATH}" ]; then
     rm -rf "$AWS_SDK_MODULE_PATH"
 fi
+if [ ! -d $ARTIFACTS_DIR ]; then
+  mkdir -p $ARTIFACTS_DIR
+fi
+
 rm -f "${ARTIFACTS_DIR}/${FUNCTION_NAME}.zip"
 zip -9 -r "${ARTIFACTS_DIR}/${FUNCTION_NAME}.zip" index.js node_modules &>/dev/null
 __r=$?
