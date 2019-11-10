@@ -39,7 +39,7 @@ if [ "$2" == "deploy" ]; then
     ./terraform plan
     ./terraform apply -auto-approve -lock=true -lock-timeout=5m
 else
-    terraform destroy -auto-approve -lock=true -lock-timeout=5m
+    ./terraform destroy -auto-approve -lock=true -lock-timeout=5m
 fi
 
 rm -rf "$MODULES_DIR"

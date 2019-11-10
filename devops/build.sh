@@ -26,6 +26,7 @@ rm -f "${ARTIFACTS_DIR}/${FUNCTION_NAME}.zip"
 zip -9 -r "${ARTIFACTS_DIR}/${FUNCTION_NAME}.zip" index.js node_modules &>/dev/null
 __r=$?
 if [ ! "$__r" -eq "0" ] ; then cd "${_pwd}" && exit 1; fi
+echo "packaged in: ${ARTIFACTS_DIR}/${FUNCTION_NAME}.zip"
 # reinstall aws
 npm install &>/dev/null
 
