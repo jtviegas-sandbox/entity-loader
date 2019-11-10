@@ -19,7 +19,7 @@ install:
 
 script:
   - npm test
-  - devops/deployments/run.sh pro deploy
+  - devops/deployments/run.sh dev deploy
 
 # Send coverage data to Coveralls
 after_script: "cat coverage/lcov.info | node_modules/coveralls/bin/coveralls.js"
