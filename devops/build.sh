@@ -5,7 +5,7 @@ base_folder=$(dirname $this_folder)
 
 
 FUNCTION_NAME="store-loader"
-SRC_DIR=${base_folder}/src
+SRC_DIR=${base_folder}
 AWS_SDK_MODULE_PATH=$SRC_DIR/node_modules/aws-sdk
 ARTIFACTS_DIR=${this_folder}/artifacts
 

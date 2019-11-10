@@ -1,0 +1,24 @@
+# safelist
+branches:
+  only:
+    - master
+
+language: node_js
+
+services:
+  - docker
+
+before_install:
+  - docker pull localstack/localstack
+
+node_js:
+  - stable
+
+install:
+  - npm install
+
+script:
+  - npm test
+
+# Send coverage data to Coveralls
+after_script: "cat coverage/lcov.info | node_modules/coveralls/bin/coveralls.js"
