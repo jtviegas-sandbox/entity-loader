@@ -9,6 +9,8 @@ fi
 parent_folder=$(dirname $this_folder)
 BUILD_SCRIPT=${parent_folder}/build.sh
 
+echo "this_folder: $this_folder"
+
 usage()
 {
   cat <<EOM
@@ -25,7 +27,7 @@ EOM
 echo "starting [ $0 $1 $2 ]..."
 _pwd=$(pwd)
 
-cd "$1"
+cd "$this_folder/$1"
 wget https://releases.hashicorp.com/terraform/0.12.13/terraform_0.12.13_linux_amd64.zip -O terraform.zip
 unzip terraform.zip
 svn export "$MODULES_URL" "$MODULES_DIR"
