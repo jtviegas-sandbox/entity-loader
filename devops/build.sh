@@ -27,7 +27,7 @@ if [ ! -d $ARTIFACTS_DIR ]; then
 fi
 
 rm -f "${ARTIFACTS_DIR}/${FUNCTION_NAME}.zip"
-zip -9 -r "${ARTIFACTS_DIR}/${FUNCTION_NAME}.zip" index.js node_modules &>/dev/null
+zip -9 -q -r "${ARTIFACTS_DIR}/${FUNCTION_NAME}.zip" index.js node_modules &>/dev/null
 __r=$?
 if [ ! "$__r" -eq "0" ] ; then cd "${_pwd}" && exit 1; fi
 echo "packaged in: ${ARTIFACTS_DIR}/${FUNCTION_NAME}.zip"
