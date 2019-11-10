@@ -19,13 +19,13 @@ cd "$SRC_DIR"
 echo "...wrapping up the function: $FUNCTION_NAME ..."
 
 npm install &>/dev/null
-if [[ -d "${AWS_SDK_MODULE_PATH}" ]]; then
+if [ -d "${AWS_SDK_MODULE_PATH}" ]; then
     rm -rf "$AWS_SDK_MODULE_PATH"
 fi
 rm -f "${ARTIFACTS_DIR}/${FUNCTION_NAME}.zip"
 zip -9 -r "${ARTIFACTS_DIR}/${FUNCTION_NAME}.zip" index.js node_modules &>/dev/null
 __r=$?
-if [[ ! "$__r" -eq "0" ]] ; then cd "${_pwd}" && exit 1; fi
+if [ ! "$__r" -eq "0" ] ; then cd "${_pwd}" && exit 1; fi
 # reinstall aws
 npm install &>/dev/null
 
