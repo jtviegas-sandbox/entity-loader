@@ -7,9 +7,9 @@ if [ -z  $this_folder ]; then
   this_folder="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 fi
 parent_folder=$(dirname $this_folder)
-BUILD_SCRIPT=${parent_folder}/build.sh
+BUILD_SCRIPT=build.sh
 
-echo "this_folder: $this_folder"
+echo "this_folder: $this_folder | parent_folder: $parent_folder"
 
 usage()
 {
@@ -33,12 +33,14 @@ unzip terraform.zip
 svn export "$MODULES_URL" "$MODULES_DIR"
 
 if [ "$2" == "deploy" ]; then
+    cd "$parent_folder"
     $BUILD_SCRIPT
-    ./terraform init
-    ./terraform plan
-    ./terraform apply -auto-approve -lock=true -lock-timeout=5m
+    cd "$this_folder/$1"
+    terraform init
+    terraform plan
+    terraform apply -auto-approve -lock=true -lock-timeout=5m
 else
-    ./terraform destroy -auto-approve -lock=true -lock-timeout=5m
+    terraform destroy -auto-approve -lock=true -lock-timeout=5m
 fi
 
 rm -rf "$MODULES_DIR"
