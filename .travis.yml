@@ -1,7 +1,7 @@
 # safelist
 branches:
   only:
-    - master
+    - /^\d+\.\d+\.\d+$/
 
 language: node_js
 
@@ -19,6 +19,7 @@ install:
 
 script:
   - npm test
+  - ./devops/deployments/run.sh pro deploy
 
 # Send coverage data to Coveralls
 after_script: "cat coverage/lcov.info | node_modules/coveralls/bin/coveralls.js"
