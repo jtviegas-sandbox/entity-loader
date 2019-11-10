@@ -19,8 +19,8 @@ EOM
 }
 
 [ -z $2 ] && { usage; }
-[ ! "$2" == "deploy" ] && [ ! "$2" == "undeploy" ] && { usage; }
-[ ! "$1" == "dev" ] && [ ! "$1" == "pro" ] && { usage; }
+[ "$2" != "deploy" ] && [ "$2" != "undeploy" ] && { usage; }
+[ "$1" != "dev" ] && [ "$1" != "pro" ] && { usage; }
 
 echo "starting [ $0 $1 $2 ]..."
 _pwd=$(pwd)
