@@ -34,6 +34,7 @@ svn export "$MODULES_URL" "$MODULES_DIR"
 
 if [ "$2" == "deploy" ]; then
     $BUILD_SCRIPT
+    ls -altr ../artifacts/
     ls -altr
     ./terraform init
     ./terraform plan
