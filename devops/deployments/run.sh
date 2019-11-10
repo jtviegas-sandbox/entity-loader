@@ -26,17 +26,20 @@ echo "starting [ $0 $1 $2 ]..."
 _pwd=$(pwd)
 
 cd "$1"
+wget https://releases.hashicorp.com/terraform/0.12.13/terraform_0.12.13_linux_amd64.zip -O terraform.zip
+unzip terraform.zip
 svn export "$MODULES_URL" "$MODULES_DIR"
 
 if [ "$2" == "deploy" ]; then
     $BUILD_SCRIPT
-    terraform init
-    terraform plan
-    terraform apply -auto-approve -lock=true -lock-timeout=5m
+    ./terraform init
+    ./terraform plan
+    ./terraform apply -auto-approve -lock=true -lock-timeout=5m
 else
-    terraform destroy -auto-approve -lock=true -lock-timeout=5m
+    ./terraform destroy -auto-approve -lock=true -lock-timeout=5m
 fi
 
 rm -rf "$MODULES_DIR"
+rm -rf terraform*
 cd "$_pwd"
 echo "...[ $0 $1 $2 ] done."
