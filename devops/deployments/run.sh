@@ -30,6 +30,7 @@ _pwd=$(pwd)
 cd "$this_folder/$1"
 wget https://releases.hashicorp.com/terraform/0.12.13/terraform_0.12.13_linux_amd64.zip -O terraform.zip
 unzip terraform.zip
+PATH="$PATH:`pwd`/terraform"
 svn export "$MODULES_URL" "$MODULES_DIR"
 
 if [ "$2" == "deploy" ]; then
