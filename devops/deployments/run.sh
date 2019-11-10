@@ -9,8 +9,9 @@ if [ -z  $this_folder ]; then
   this_folder="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 fi
 parent_folder=$(dirname $this_folder)
-BUILD_SCRIPT="$parent_folder/build.sh"
 echo "this_folder: $this_folder | parent_folder: $parent_folder"
+build_script="$parent_folder/build.sh"
+terraform_command=terraform
 
 usage()
 {
@@ -29,19 +30,26 @@ echo "starting [ $0 $1 $2 ]..."
 _pwd=$(pwd)
 echo "...leaving $_pwd to $this_folder/$1..."
 cd "$this_folder/$1"
-wget $TERRAFORM_ZIP -O terraform.zip
-unzip terraform.zip
+
+which terraform
+if [ ! "$?" -eq "0" ] ; then
+  echo "...have to install terraform..."
+  terraform_command=./terraform
+  wget $TERRAFORM_ZIP -O terraform.zip
+  unzip terraform.zip
+fi
+
+
 svn export "$MODULES_URL" "$MODULES_DIR"
 
 if [ "$2" == "deploy" ]; then
-    $BUILD_SCRIPT
-    ls -altr ../artifacts/
+    $build_script
     ls -altr
-    ./terraform init
-    ./terraform plan
-    ./terraform apply -auto-approve -lock=true -lock-timeout=5m
+    $terraform_command init
+    $terraform_command plan
+    $terraform_command apply -auto-approve -lock=true -lock-timeout=5m
 else
-    ./terraform destroy -auto-approve -lock=true -lock-timeout=5m
+    $terraform_command destroy -auto-approve -lock=true -lock-timeout=5m
 fi
 __r=$?
 rm -rf "$MODULES_DIR"
