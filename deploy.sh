@@ -35,14 +35,13 @@ which terraform
 if [ ! "$?" -eq "0" ] ; then
   echo "...have to install terraform..."
   terraform_command=./terraform
-  wget $TERRAFORM_ZIP -O terraform.zip
+  wget $TERRAFORM_ZIP -O terraform.zip --quiet
   unzip terraform.zip
 fi
 
-
 svn export "$MODULES_URL" "$MODULES_DIR"
 
-if [ "$2" == "deploy" ]; then
+if [ "$2" == "yes" ]; then
     $build_script
     ls -altr
     $terraform_command init
