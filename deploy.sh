@@ -8,28 +8,28 @@ this_folder=$(dirname $(readlink -f $0))
 if [ -z  $this_folder ]; then
   this_folder="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 fi
-parent_folder=$(dirname $this_folder)
-echo "this_folder: $this_folder | parent_folder: $parent_folder"
-build_script="$parent_folder/build.sh"
+
+build_script="$this_folder/build.sh"
+deployments_dir="$this_folder/devops/deployments"
 terraform_command=terraform
 
 usage()
 {
   cat <<EOM
   usage:
-  $(basename $0) [dev|pro] [deploy|undeploy]
+  $(basename $0) [dev|pro] [yes|no]
 EOM
   exit 1
 }
 
 [ -z $2 ] && { usage; }
-[ "$2" != "deploy" ] && [ "$2" != "undeploy" ] && { usage; }
+[ "$2" != "yes" ] && [ "$2" != "no" ] && { usage; }
 [ "$1" != "dev" ] && [ "$1" != "pro" ] && { usage; }
 
 echo "starting [ $0 $1 $2 ]..."
 _pwd=$(pwd)
-echo "...leaving $_pwd to $this_folder/$1..."
-cd "$this_folder/$1"
+echo "...leaving $_pwd to $deployments_dir/$1..."
+cd "$deployments_dir/$1"
 
 which terraform
 if [ ! "$?" -eq "0" ] ; then
