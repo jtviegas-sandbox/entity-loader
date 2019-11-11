@@ -9,7 +9,6 @@ fi
 echo "this_folder: $this_folder"
 base_folder=$(dirname "$this_folder")
 
-SRC_DIR="$base_folder"
 AWS_REGION=eu-west-1
 AWS_CLI_OUTPUT_FORMAT=text
 CONTAINER=localaws
@@ -87,7 +86,7 @@ rm -rf ${RESOURCES_FOLDER}/*
 debug "...cleaned content in folder $RESOURCES_FOLDER..."
 
 if [ "$__r" -eq "0" ] ; then
-  "$SRC_DIR"/node_modules/istanbul/lib/cli.js cover "$SRC_DIR"/node_modules/mocha/bin/_mocha -- -R spec "$this_folder"/test.js
+  "$base_folder"/node_modules/istanbul/lib/cli.js cover "$base_folder"/node_modules/mocha/bin/_mocha -- -R spec "$this_folder"/test.js
   __r=$?
 fi
 
