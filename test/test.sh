@@ -7,20 +7,20 @@ if [ -z "$this_folder" ]; then
     this_folder=$(dirname $(readlink -f $0))
 fi
 echo "this_folder: $this_folder"
-parent_folder=$(dirname $this_folder)
+base_folder=$(dirname "$this_folder")
 
+SRC_DIR="$base_folder"
 AWS_REGION=eu-west-1
 AWS_CLI_OUTPUT_FORMAT=text
 CONTAINER=localaws
 APP="app"
 ENVIRONMENT="dev"
 BUCKET="$APP-$ENVIRONMENT-entities"
-FOLDER="$this_folder/test/resources"
+FOLDER="$this_folder/resources"
 FILE_EXCLUDE="**/trigger"
 AWS_S3_URL="http://localhost:5000"
 AWS_DB_CONTAINER="http://localhost:8000"
 ENTITIES="entity1 entity2"
-
 RESOURCES_FOLDER="/tmp/resources"
 
 if [ -z $STORELOADER_AWS_REGION ]; then
@@ -86,17 +86,16 @@ fi
 rm -rf ${RESOURCES_FOLDER}/*
 debug "...cleaned content in folder $RESOURCES_FOLDER..."
 
-
 if [ "$__r" -eq "0" ] ; then
-  node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- -R spec test/test.js
+  "$SRC_DIR"/node_modules/istanbul/lib/cli.js cover "$SRC_DIR"/node_modules/mocha/bin/_mocha -- -R spec "$this_folder"/test.js
   __r=$?
 fi
 
-cd $_pwd
+
 
 echo "...stopping aws mock container..."
 docker stop $CONTAINER && docker rm $CONTAINER
 rm "${this_folder}"/aws.sh
-
+cd $_pwd
 echo "...store loader test done. [$__r]"
 exit $__r

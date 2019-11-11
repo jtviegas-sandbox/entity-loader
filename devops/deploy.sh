@@ -8,9 +8,10 @@ this_folder=$(dirname $(readlink -f $0))
 if [ -z  $this_folder ]; then
   this_folder="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 fi
-
+base_folder=$(dirname "$this_folder")
+echo "this_folder: $this_folder | base_folder: $base_folder"
 build_script="$this_folder/build.sh"
-deployments_dir="$this_folder/devops/deployments"
+deployments_dir="$this_folder/deployments"
 terraform_command=terraform
 
 usage()
