@@ -48,7 +48,7 @@ and then place the trigger file in the root folder to trigger the upload process
   - if you want set the AWS region to your specific case, export the environment variable `TF_VAR_region`, default region is always `eu-west-1`;
   - create the terraform remote state bucket and table, use the script `devops/tf-state/run.sh`;
   - deploy the store loader invoking the script `devops/deploy.sh`;
-  - you should now create the related entity tables, `${app}-${env}-${entity-*}`, the store loader will write on it;
+  - you should now create the related entity tables, `store-loader-${env}-${entity-*}`, the store loader will write on it;
   - End products:
     - `${app}-${env}-entities` bucket;
   - dump the entities folders (accordingly to the tables that you've created) and content in the buckets;
