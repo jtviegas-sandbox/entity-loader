@@ -44,12 +44,14 @@ So, to load the data into a table (currently `aws dynamodb`) one should create a
 and then place the trigger file in the root folder to trigger the upload process.
 
 ### procedure
-  - edit the variables in `platform/pro/main.tf` and in `platform/dev/main.tf`;
-  - invoke `platform/platform.sh` to deploy and undeploy to aws;
+  - in your working console session, login to your AWS account;
+  - if you want set the AWS region to your specific case, export the environment variable `TF_VAR_region`, default region is always `eu-west-1`;
+  - create the remote state bucket and table, use the script `devops/tf-state/run.sh`;
+  - deploy the store loader invoking the script `devops/deploy.sh`;
+  - you should now create the related entity tables, `${app}-${env}-${entity-*}`, the store loader will write on it;
   - End products:
-    - `${app}-${env}-${entity-*}` tables; 
     - `${app}-${env}-entities` bucket;
-  - dump the entities folders and content in the buckets;
+  - dump the entities folders (accordingly to the tables that you've created) and content in the buckets;
   - dump the `trigger` file in the root;
   - End products:
     - all the entities will be now entries in the table, and the images will be linked to the images in the bucket folder;
