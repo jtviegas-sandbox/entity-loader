@@ -15,27 +15,31 @@ ARTIFACTS_DIR=${DEVOPS_DIR}/artifacts
 
 echo "starting [ $0 ]..."
 _pwd=`pwd`
+
 echo "...leaving $_pwd to $SRC_DIR..."
 cd "$SRC_DIR"
 echo "...wrapping up the function: $FUNCTION_NAME ..."
 
 npm install &>/dev/null
-if [ -d "${AWS_SDK_MODULE_PATH}" ]; then
-    rm -rf "$AWS_SDK_MODULE_PATH"
-fi
-if [ ! -d "$ARTIFACTS_DIR" ]; then
-  mkdir -p "$ARTIFACTS_DIR"
-fi
-
-rm -f "${ARTIFACTS_DIR}/${FUNCTION_NAME}.zip"
-zip -9 -q -r "${ARTIFACTS_DIR}/${FUNCTION_NAME}.zip" index.js node_modules &>/dev/null
 __r=$?
-if [ ! "$__r" -eq "0" ] ; then cd "${_pwd}" && exit 1; fi
-echo "packaged in: ${ARTIFACTS_DIR}/${FUNCTION_NAME}.zip"
-# reinstall aws
-npm install &>/dev/null
+if [ "$__r" -eq "0" ] ; then
+  if [ -d "${AWS_SDK_MODULE_PATH}" ]; then
+      rm -rf "$AWS_SDK_MODULE_PATH"
+  fi
+  if [ ! -d "$ARTIFACTS_DIR" ]; then
+    mkdir -p "$ARTIFACTS_DIR"
+  fi
+  rm -f "${ARTIFACTS_DIR}/${FUNCTION_NAME}.zip"
+  zip -9 -q -r "${ARTIFACTS_DIR}/${FUNCTION_NAME}.zip" index.js node_modules &>/dev/null
+  __r=$?
+fi
+if [ "$__r" -eq "0" ] ; then
+  echo "packaged in: ${ARTIFACTS_DIR}/${FUNCTION_NAME}.zip"
+  # reinstall aws
+  npm install &>/dev/null
+fi
 
 echo "...function $FUNCTION_NAME wrapping up done..."
 echo "...returning to $_pwd..."
 cd "$_pwd"
-echo "...[ $0 ] done."
+echo "...[ $__r ] done."

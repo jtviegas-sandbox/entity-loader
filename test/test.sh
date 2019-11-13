@@ -90,8 +90,6 @@ if [ "$__r" -eq "0" ] ; then
   __r=$?
 fi
 
-
-
 echo "...stopping aws mock container..."
 docker stop $CONTAINER && docker rm $CONTAINER
 rm "${this_folder}"/aws.sh
