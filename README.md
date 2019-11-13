@@ -50,7 +50,7 @@ and then place the trigger file in the root folder to trigger the upload process
   - deploy the store loader invoking the script `devops/deploy.sh`;
   - you should now create the related entity tables, `store-loader-${env}-${entity-*}`, the store loader will write on it;
   - End products:
-    - `${app}-${env}-entities` bucket;
+    - `store-loader-${env}-entities` bucket;
   - dump the entities folders (accordingly to the tables that you've created) and content in the buckets;
   - dump the `trigger` file in the root;
   - End products:
