@@ -4,7 +4,7 @@
   "description": "a solution to load entities to an s3 bucket and through an event function to create related entries in a DynamoDB table",
   "main": "index.js",
   "scripts": {
-    "test": "./test.sh",
+    "test": "bash test/test.sh",
     "cover": "node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- -R spec test/*"
   },
   "repository": {
