@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/jtviegas/store-loader.svg?branch=master)](https://travis-ci.org/jtviegas/store-loader)
+[![Coverage Status](https://coveralls.io/repos/github/jtviegas/store-loader/badge.svg?branch=master)](https://coveralls.io/github/jtviegas/store-loader?branch=master)
+
 store loader
 =========
 
