@@ -17,10 +17,12 @@ EOM
 [ ! "$2" == "deploy" ] && [ ! "$2" == "undeploy" ] && { usage; }
 [ ! "$1" == "dev" ] && [ ! "$1" == "pro" ] && { usage; }
 
+run_folder="${this_folder}/tf-state/$1"
+
 echo "starting [ $0 $1 $2 ]..."
 _pwd=$(pwd)
 
-cd "$1"
+cd "$run_folder"
 svn export "$MODULES_URL" "$MODULES_DIR"
 
 if [ "$2" == "deploy" ]; then
