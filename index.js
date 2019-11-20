@@ -3,29 +3,20 @@
 const winston = require('winston');
 const commons = require('@jtviegas/jscommons').commons;
 const ServerError = require('@jtviegas/jscommons').ServerError;
+const service = require('@jtviegas/entity-loader-service');
 const logger = winston.createLogger(commons.getDefaultWinstonConfig());
 
-const constants = {
-    STORELOADERSERVICE_DATA_DESCRIPTOR_FILE: 'data.spec'
-    , STORELOADER_ENVIRONMENTS: ['pro','dev']
-};
-const CONFIGURATION_SPEC = {
-    STORELOADERSERVICE_AWS_REGION: 'STORELOADER_AWS_REGION'
-    , STORELOADERSERVICE_AWS_ACCESS_KEY_ID: 'STORELOADER_AWS_ACCESS_KEY_ID'
-    , STORELOADERSERVICE_AWS_ACCESS_KEY: 'STORELOADER_AWS_ACCESS_KEY'
+logger.info("[entityLoader]...initializing entity-loader module...");
 
-    // testing environment
-    , STORELOADERSERVICE_TEST_bucket_endpoint: 'STORELOADER_TEST_bucket_endpoint'
-    , STORELOADERSERVICE_TEST_store_endpoint: 'STORELOADER_TEST_store_endpoint'
-};
+const CONSTANTS = { region: 'eu-west-1' };
+const CONFIGURATION_SPEC = [ 'region', 'AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY'
+    , 'DYNDBSTORE_TEST_ENDPOINT', 'BUCKETWRAPPER_TEST_ENDPOINT' ];
+let configuration = commons.mergeConfiguration(CONSTANTS, commons.getEnvironmentVarsSubset(CONFIGURATION_SPEC));
 
-logger.info("[storeloader]...initializing store-loader module...");
-let configuration = commons.mergeConfiguration( commons.getEnvironmentConfiguration(CONFIGURATION_SPEC, commons.handleTestVariables), constants);
-logger.info("[storeloader] configuration: %o", configuration);
-const service = require('@jtviegas/store-loader-service')(configuration);
+logger.info("[entityLoader] configuration: %o", configuration);
 
 exports.handler = (event, context, callback) => {
-    logger.info('[storeloader|handler|in] (event: %o, context: %o)', event, context);
+    logger.info('[entityLoader|handler|in] (event: %o, context: %o)', event, context);
 
     const done = (err, res) => callback( null, {
         statusCode: err ? ( err.status ? err.status : 500 ) : 200,
@@ -47,17 +38,13 @@ exports.handler = (event, context, callback) => {
                 let bucketNameElements = record.s3.bucket.name.split("-");
                 environment = bucketNameElements[bucketNameElements.length-2];
                 app = record.s3.bucket.name.substr(0, record.s3.bucket.name.indexOf(`-${environment}`));
-                if( -1 >= configuration.STORELOADER_ENVIRONMENTS.indexOf(environment) ){
-                    logger.warn('[storeloader|handler] wrong environment: %s)', environment);
-                    throw new ServerError(`wrong environment: "${environment}"`, 400);
-                }
                 bucket = record.s3.bucket.name;
                 break;
             }
         }
 
         if( null === environment  || null === app || null === bucket ){
-            logger.warn('[storeloader|handler] wrong input => environment:%s | app:%s | bucket:%s)', environment, app, bucket);
+            logger.warn('[entityLoader|handler] wrong input => environment:%s | app:%s | bucket:%s)', environment, app, bucket);
             throw new ServerError("event must provide 'entity1', 'environment' and 'bucket'", 400);
         }
 
@@ -67,6 +54,6 @@ exports.handler = (event, context, callback) => {
     catch(error) {
         done(error);
     }
-    logger.info('[storeloader|handler|out]');
+    logger.info('[entityLoader|handler|out]');
 };
 

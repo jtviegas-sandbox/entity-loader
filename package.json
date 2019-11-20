@@ -1,5 +1,5 @@
 {
-  "name": "store-loader",
+  "name": "@jtviegas/entity-loader",
   "version": "0.0.3",
   "description": "a solution to load entities to an s3 bucket and through an event function to create related entries in a DynamoDB table",
   "main": "index.js",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jtviegas/store-loader.git"
+    "url": "git+https://github.com/jtviegas/entity-loader.git"
   },
   "keywords": [
     "aws",
@@ -20,16 +20,16 @@
   "author": "Joao Tiago Viegas <jtviegas.js@gmail.com>",
   "license": "Unlicense",
   "bugs": {
-    "url": "https://github.com/jtviegas/store-loader/issues"
+    "url": "https://github.com/jtviegas/entity-loader/issues"
   },
-  "homepage": "https://github.com/jtviegas/store-loader#readme",
+  "homepage": "https://github.com/jtviegas/entity-loader#readme",
   "dependencies": {
     "@jtviegas/jscommons": "latest",
-    "@jtviegas/store-loader-service": "0.0.25",
+    "@jtviegas/entity-loader-service": "latest",
     "winston": "^3.2.1"
   },
   "devDependencies": {
-    "@jtviegas/bucket-wrapper": "0.0.8",
+    "@jtviegas/bucket-wrapper": "latest",
     "@jtviegas/dyndbstore": "latest",
     "chai": "^4.2.0",
     "coveralls": "^3.0.7",

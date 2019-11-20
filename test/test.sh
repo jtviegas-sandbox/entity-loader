@@ -22,27 +22,8 @@ AWS_DB_CONTAINER="http://localhost:8000"
 ENTITIES="entity1 entity2"
 RESOURCES_FOLDER="/tmp/resources"
 
-if [ -z $STORELOADER_AWS_REGION ]; then
-  export STORELOADER_AWS_REGION="eu-west-1"
-fi
-echo "STORELOADER_AWS_REGION: $STORELOADER_AWS_REGION"
-if [ -z $STORELOADER_AWS_ACCESS_KEY_ID ]; then
-  export STORELOADER_AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID__SPLIT4EVER_DEV
-fi
-echo "STORELOADER_AWS_ACCESS_KEY_ID: $STORELOADER_AWS_ACCESS_KEY_ID"
-if [ -z $STORELOADER_AWS_ACCESS_KEY ]; then
-  export STORELOADER_AWS_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY__SPLIT4EVER_DEV
-fi
-echo "STORELOADER_AWS_ACCESS_KEY: $STORELOADER_AWS_ACCESS_KEY"
-
-export AWS_SECRET_ACCESS_KEY=$STORELOADER_AWS_ACCESS_KEY
-echo "AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY"
-export AWS_ACCESS_KEY_ID=$STORELOADER_AWS_ACCESS_KEY_ID
-echo "AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID"
-
-export STORELOADER_APP=store
-export STORELOADER_TEST_bucket_endpoint="$AWS_S3_URL"
-export STORELOADER_TEST_store_endpoint="$AWS_DB_CONTAINER"
+export DYNDBSTORE_TEST_ENDPOINT=$AWS_DB_CONTAINER
+export BUCKETWRAPPER_TEST_ENDPOINT=$AWS_S3_URL
 
 echo "starting store loader tests..."
 
@@ -67,7 +48,7 @@ for e in ${ENTITIES}; do
 
   table="${APP}-${ENVIRONMENT}-${e}"
   echo "...creating store table $table..."
-  createTable "${table}" ${STORELOADER_TEST_store_endpoint}
+  createTable "${table}" ${DYNDBSTORE_TEST_ENDPOINT}
   __r=$?
   if [[ ! "$__r" -eq "0" ]] ; then cd "${_pwd}" && exit 1; fi
   info "...created store table $table."
@@ -91,7 +72,7 @@ if [ "$__r" -eq "0" ] ; then
 fi
 
 if [ "$__r" -eq "0" ] ; then
-  cat "$base_folder"/coverage/lcov.info | "$base_folder"/node_modules/coveralls/bin/coveralls.js
+  cat "$this_folder"/coverage/lcov.info | "$base_folder"/node_modules/coveralls/bin/coveralls.js
 fi
 
 echo "...stopping aws mock container..."

@@ -5,25 +5,16 @@ const path = require('path');
 const winston = require('winston');
 const commons = require('@jtviegas/jscommons').commons;
 const logger = winston.createLogger(commons.getDefaultWinstonConfig());
-
 const chai = require('chai');
 const expect = chai.expect;
 const store = require('@jtviegas/dyndbstore');
+const index = require('../index');
 
 const config = {
-
-    DYNDBSTORE_AWS_REGION: 'eu-west-1'
-    , DYNDBSTORE_AWS_ACCESS_KEY_ID: process.env.ACCESS_KEY_ID
-    , DYNDBSTORE_AWS_ACCESS_KEY: process.env.ACCESS_KEY
-    , DYNDBSTORE_TEST: { store_endpoint: 'http://localhost:8000' }
-
-    , APP: 'app'
+    APP: 'app'
     , ENTITIES: ['entity1','entity2']
     , ENVIRONMENT: 'dev'
-
 };
-
-const index = require('../index');
 
 describe('index tests', function() {
 
@@ -32,16 +23,6 @@ describe('index tests', function() {
     for( let i=0; i < config.ENTITIES.length; i++ ){
         tables.push(commons.getTableNameV4(config.APP, config.ENTITIES[i], config.ENVIRONMENT))
     }
-
-    before(function(done) {
-        try{
-            store.init(config );
-            done(null);
-        }
-        catch(e){
-            done(e);
-        }
-    });
 
     describe('...bucket event on development with 3 items', function(done) {
 
@@ -71,7 +52,7 @@ describe('index tests', function() {
                 else {
                     try{
                         for( let i=0; i < tables.length; i++ ){
-                            let table =tables[i];
+                            let table=tables[i];
                             store.getObjs(table, (e,r) => {
                                 if(e)
                                     done(e);
