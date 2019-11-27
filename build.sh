@@ -4,14 +4,13 @@ this_folder=$(dirname $(readlink -f $0))
 if [ -z  $this_folder ]; then
   this_folder="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 fi
-base_folder=$(dirname "$this_folder")
-echo "this_folder: $this_folder | base_folder: $base_folder"
 
-DEVOPS_DIR=${this_folder}
-FUNCTION_NAME="store-loader"
-SRC_DIR=${base_folder}
+FUNCTION_NAME="entity-loader"
+SRC_DIR=${this_folder}
 AWS_SDK_MODULE_PATH=$SRC_DIR/node_modules/aws-sdk
-ARTIFACTS_DIR=${DEVOPS_DIR}/artifacts
+ARTIFACTS_DIR=${SRC_DIR}/artifacts
+
+
 
 echo "starting [ $0 ]..."
 _pwd=`pwd`

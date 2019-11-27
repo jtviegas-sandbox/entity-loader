@@ -71,4 +71,3 @@ tmp/
 .terraform
 *.tfstate
 *.tfstate.backup
-store-loader.zip

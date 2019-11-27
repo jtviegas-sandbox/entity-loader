@@ -25,7 +25,7 @@ RESOURCES_FOLDER="/tmp/resources"
 export DYNDBSTORE_TEST_ENDPOINT=$AWS_DB_CONTAINER
 export BUCKETWRAPPER_TEST_ENDPOINT=$AWS_S3_URL
 
-echo "starting store loader tests..."
+echo "starting entity loader tests..."
 
 _pwd=`pwd`
 cd $this_folder
@@ -47,11 +47,11 @@ for e in ${ENTITIES}; do
   ls $resources_folder
 
   table="${APP}-${ENVIRONMENT}-${e}"
-  echo "...creating store table $table..."
+  echo "...creating entity table $table..."
   createTable "${table}" ${DYNDBSTORE_TEST_ENDPOINT}
   __r=$?
   if [[ ! "$__r" -eq "0" ]] ; then cd "${_pwd}" && exit 1; fi
-  info "...created store table $table."
+  info "...created entity table $table."
 done
 
 echo "...creating test bucket..."
@@ -78,6 +78,8 @@ fi
 echo "...stopping aws mock container..."
 docker stop $CONTAINER && docker rm $CONTAINER
 rm "${this_folder}"/aws.sh
-cd $_pwd
-echo "...store loader test done. [$__r]"
+cd "$_pwd"
+echo "...entity loader test done. [$__r]"
 exit $__r
+
+${${grep -w "version" package.json| cut -d':' -f2}

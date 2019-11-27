@@ -45,7 +45,7 @@ exports.handler = (event, context, callback) => {
 
         if( null === environment  || null === app || null === bucket ){
             logger.warn('[entityLoader|handler] wrong input => environment:%s | app:%s | bucket:%s)', environment, app, bucket);
-            throw new ServerError("event must provide 'entity1', 'environment' and 'bucket'", 400);
+            throw new ServerError("event must provide 'app', 'environment' and 'bucket'", 400);
         }
 
         service.load(app, environment, bucket, done);
