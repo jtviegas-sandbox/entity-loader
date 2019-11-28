@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/jtviegas/store-loader.svg?branch=master)](https://travis-ci.org/jtviegas/store-loader)
+[![Build Status](https://travis-ci.org/jtviegas/entity-loader.svg?branch=master)](https://travis-ci.org/jtviegas/entity-loader)
 [![Coverage Status](https://coveralls.io/repos/github/jtviegas/entity-loader/badge.svg?branch=master)](https://coveralls.io/github/jtviegas/entity-loader?branch=master)
 entity loader
 =========
