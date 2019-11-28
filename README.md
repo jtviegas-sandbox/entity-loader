@@ -20,8 +20,8 @@ Current implementation uses aws S3 and DynamoDB.
 A service that loads entities from folders in a bucket (elements described by `data.spec` file and related 
 ```[0-9]*_[0-9]*\.{jpg|png|gif}``` image files) into a table.
 
-Currently the entities, and therefore the tables in the data store, will be named after the app, the bucket folder name and its environment,
- as in ```${app}_${foldername=entity}_${env}```.
+Currently the entities, and therefore the tables in the data store, will be named after the environment, app name and the entity name,
+ as in bucket: ```${app}-${env}-entities``` and the key/folder: ```${entity}/```.
 There will be also a ```trigger``` file, that should be created in the root folder to generate an event
 that will trigger the loading process.
 The bucket folder structure, can be exemplified as in:
@@ -43,17 +43,11 @@ So, to load the data into a table (currently `aws dynamodb`) one should create a
 and then place the trigger file in the root folder to trigger the upload process.
 
 ### procedure
-  - in your working console session, login to your AWS account;
-  - if you want set the AWS region to your specific case, export the environment variable `TF_VAR_region`, default region is always `eu-west-1`;
-  - create the terraform remote state bucket and table, use the script `devops/tf-state/run.sh`;
-  - deploy the store loader invoking the script `devops/deploy.sh`;
-  - you should now create the related entity tables, `store-loader-${env}-${entity-*}`, the store loader will write on it;
-  - End products:
-    - `store-loader-${env}-entities` bucket;
+  - create the related entity tables, `${app}-${env}-${entity}`, the store loader will write on it;
   - dump the entities folders (accordingly to the tables that you've created) and content in the buckets;
   - dump the `trigger` file in the root;
   - End products:
-    - all the entities will be now entries in the table, and the images will be linked to the images in the bucket folder;
+    - all the entities will be now created as new entries in the table, and the images will be linked to the images in the bucket folder;
     - example:
     ```
         { 
@@ -69,10 +63,10 @@ and then place the trigger file in the root folder to trigger the upload process
         images:
             [ { name: undefined,
                 type: 'image/png',
-                href: 'https://s3.eu-west-1.amazonaws.com/store-dev-entities/parts/1_1.png' },
+                href: 'https://s3.eu-west-1.amazonaws.com/myapp-dev-entities/parts/1_1.png' },
                 { name: undefined,
                 type: 'image/png',
-                href: 'https://s3.eu-west-1.amazonaws.com/store-dev-entities/parts/1_2.png' } ] 
+                href: 'https://s3.eu-west-1.amazonaws.com/myapp-dev-entities/parts/1_2.png' } ] 
         }
     ```
     
