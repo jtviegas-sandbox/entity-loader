@@ -71,10 +71,6 @@ if [ "$__r" -eq "0" ] ; then
   __r=$?
 fi
 
-if [ "$__r" -eq "0" ] ; then
-  cat "$this_folder"/coverage/lcov.info | "$base_folder"/node_modules/coveralls/bin/coveralls.js
-fi
-
 echo "...stopping aws mock container..."
 docker stop $CONTAINER && docker rm $CONTAINER
 rm "${this_folder}"/aws.sh
