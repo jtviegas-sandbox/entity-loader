@@ -11,10 +11,6 @@ Current implementation uses aws S3 and DynamoDB.
 
 ![overview][overview]
 
-## Installation
-
-  `npm install @jtviegas/entity-loader`
-
 ## Usage
 
 ### description
