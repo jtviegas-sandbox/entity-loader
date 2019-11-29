@@ -9,6 +9,8 @@ to be later retrieved and linked from a web application.
 The content data is store in the db, the `binary | image` data is then left in the bucket and linked from the content data.
 Current implementation uses aws S3 and DynamoDB.
 
+![overview][overview]
+
 ## Installation
 
   `npm install @jtviegas/entity-loader`
@@ -82,3 +84,6 @@ and then place the trigger file in the root folder to trigger the upload process
 ## Contributing
 
 just help yourself and submit a pull request
+
+
+[overview]: assets/overview.png "overview"
